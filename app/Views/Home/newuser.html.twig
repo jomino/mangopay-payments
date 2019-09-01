@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/">
+<title>Mangopay Payment Admin</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="css/application.css">
+<link rel="stylesheet" href="css/newuser.css">
+<script src="js/jquery-1.12.4.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container main hidden">
+        <div class="row header">
+            <div class="col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="text-center">
+                    <h1 class="boldi light-blue">Ipefix Payment Solution</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row content">
+            <div class="col-sm-6 col-xs-12 border-right">
+                <div class="content-left">
+                    <h2 class="dark-blue boldi">Ajouter un vendeur</h2>
+                    <h4 class="result{%- if error %} mid-red{%- else %} mid-green{%- endif -%}">
+                        {% if error -%}
+                            Une erreur est survenue  <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                        {% else -%}
+                            Vendeur ajouter  <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+                        {%- endif -%}
+                    </h4>
+                    <p>
+                        {%- if error -%}
+                            Vous trouverez le détail de l'erreur sur la partie droite de la page.
+                        {%- else -%}
+                            Voici l'adresse de base du lien pour initier toute transaction de payement depuis le site du vendeur.
+                        {%- endif -%}
+                    </p>
+                    <div class="input-group generated-link">
+                        <input type="text" class="form-control" name="generated-link" value="{%- if not error -%}{{ generated_link }}{%- endif -%}"{%- if error %} disabled{%- endif -%}>
+                        <div class="input-group-addon{%- if not error %} clickable{%- endif -%}">
+                            <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                    <form action="{{ path_for('adduser') }}" method="get">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-default btn-sm btn-block bold">
+                                {%- if error -%}
+                                    Retour
+                                {%- else -%}
+                                    Continuer
+                                {%- endif -%}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xs-12 border-left">
+                <div class="content-right">
+                    <p>
+                        {%- if error -%}
+                            <strong><u>Détail de l'erreur:</u></strong><br>
+                            <code class="code">{{ error|raw }}</code>
+                        {%- else -%}
+                            Ce dernier est à insérer dans une balise &lt;a href="..."&gt;.
+                            Il faut le compléter avec le prix exprimé en centime d'euro et la reférence du produit,
+                            le tout séparer par des slash ("/") de sorte à en faire un lien valide. 
+                            Expl: <code class="code">https://adresse_de_base/12300/mon-produit-num-123</code><br>
+                            Le prix doit forcement être un nombre (pas de lettre ajoutée)
+                            et la référence du produit ne peut contenir que des caractères alpha-numérique (pas de caractères accentués),
+                            seule le tiret ("-") et le trait de soulignement ("_") sont tolérés.
+                        {%- endif -%}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row footer">
+            <div class="col-sm-4 col-sm-offset-4">
+                <div class="text-center copyr">&copy; Ipefix 2019</div>
+            </div>
+        </div>
+    </div>
+    <div class="container loader"></div>
+    <script src="js/loadingoverlay.min.js"></script>
+    <script src="js/newuser.js"></script>
+    <script src="js/application.js"></script>
+</body>
+</html>

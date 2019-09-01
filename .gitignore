@@ -1,0 +1,6 @@
+_*
+/app/Parameters*
+!/app/Parameters.php.dist
+/vendor/*
+/logs/*
+!/logs/.gitkeep

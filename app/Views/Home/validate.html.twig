@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/">
+<title>Mangopay Payment Admin</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="css/application.css">
+<link rel="stylesheet" href="css/validate.css">
+<script src="js/jquery-1.12.4.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container main hidden">
+        <div class="row header">
+            <div class="col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="text-center">
+                    <h1 class="boldi light-blue">Ipefix Payment Solution</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row content">
+            <form action="{{ generated_link }}" method="post">
+                <input type="hidden" name="{{csrf.keys.name}}" value="{{csrf.name}}">
+                <input type="hidden" name="{{csrf.keys.value}}" value="{{csrf.value}}">
+                <div class="col-sm-6 col-xs-12 border-right">
+                    <div class="content-left">
+                        <h2 class="dark-blue boldi">Inscription client</h2>
+                        <p>
+                            Veuillez insérer vos identifiants ici.
+                            Il s'agit de "L'Api key" que vous avez reçu et le "ClientId" 
+                            que vous avez choisi lors de votre inscription 
+                            au service MangoPay.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xs-12 border-left">
+                    <div class="content-right">
+                        <div class="form-container">
+                            <div class="form-group">
+                                <label class="mid-blue">Votre ClientId :</label>
+                                <input type="text" class="form-control" name="ckey" placeholder="" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="mid-blue">Votre Api key:</label>
+                                <input type="password" class="form-control" name="akey" placeholder="" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-default btn-sm btn-block bold">Enregistrer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row footer">
+            <div class="col-sm-4 col-sm-offset-4">
+                <div class="text-center copyr">&copy; Ipefix 2019</div>
+            </div>
+        </div>
+    </div>
+    <div class="container loader"></div>
+    <script src="js/loadingoverlay.min.js"></script>
+    <script src="js/application.js"></script>
+</body>
+</html>

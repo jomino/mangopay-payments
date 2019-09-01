@@ -1,0 +1,34 @@
+<?php
+
+namespace App;
+
+class Parameters
+{
+    const SYSTEM = [
+        'debug' => true
+    ];
+
+    const DATABASE = [
+        'driver' => 'mysql',
+        'host' => 'localhost',
+        'database' => 'hipay_payments',
+        'username' => '',
+        'password' => '',
+        'charset' => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix' => ''
+    ];
+
+    const EMAIL = [
+        'host' => '',
+        'username' => '',
+        'password' => ''
+    ];
+
+    const SECURITY = [
+        'status' => 'login_status',
+        'cookie' => 'X-Auth',
+        'secret' => '',
+        'login' => ''
+    ];
+}
