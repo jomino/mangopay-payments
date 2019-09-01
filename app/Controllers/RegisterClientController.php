@@ -102,7 +102,7 @@ class RegisterClientController extends \Core\Controller
         if($response!==true){
             $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
             $this->logger->info('['.$ip.'] REGISTER_NEWUSER_WEBHOOK_REJECTED -> ERROR: '.$response);
-            $this->errors[] = 'Nous sommes dans l\'impossibilité de vous relié à la plateforme stripe-webhook';
+            $this->errors[] = 'Nous sommes dans l\'impossibilité de vous relié à la plateforme MangoPay';
             return false;
         }else{
             return true;
