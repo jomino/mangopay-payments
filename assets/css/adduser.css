@@ -1,24 +1,25 @@
 
 @media (min-width: 768px) {
     .main .content-left .form-group button {
-        margin-top: 10px;
+      margin-top: 10px;
     }
     .main .content-left .form-group input {
-        margin-top: 10px;
-        max-width: 300px;
+      margin-top: 10px;
+      max-width: 300px;
     }
     .main .content-left .form-group input + span {
-      padding-right: 30px;
+      display: inline;
+      position: relative;
     }
     .main .content-left .form-group input:invalid + span:after {
-      position: absolute;
+      color: #FF3C26;
       content: '✖';
-      padding-left: 5px;
+      padding-left: -15px;
     }
     .main .content-left .form-group input:valid + span:after {
-      position: absolute;
+      color: #5CA700;
       content: '✓';
-      padding-left: 5px;
+      padding-left: -15px;
     }
     .main .content-right p {
         max-width: 300px;
