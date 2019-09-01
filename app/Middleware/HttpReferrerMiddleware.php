@@ -20,7 +20,7 @@ class HttpReferrerMiddleware
                 $domain = $request->getServerParam('HTTP_REFERER', '');
             }
             $domain = preg_replace('#^(?:http[s]?://)?([a-z0-9\-._~%]+)(?:/?.*)$#i','$1',$domain);
-            $session->set(\Util\StripeUtility::SESSION_DOMAIN,$domain);
+            $session->set(\Util\MangopayUtility::SESSION_DOMAIN,$domain);
         }
         return $next($request, $response);
     }

@@ -8,8 +8,8 @@ class HomeController extends \Core\Controller
     {
         $ip = $request->getServerParam('REMOTE_ADDR');
         $cookie = \Util\Tools::cookieGetValue(\Dflydev\FigCookies\FigRequestCookies::get($request, \App\Parameters::SECURITY['cookie'], 'none'));
-        if($this->session->exists(\Util\StripeUtility::SESSION_LOGIN)){
-            $pass_phrase = $this->session->get(\Util\StripeUtility::SESSION_LOGIN).'-'.\App\Parameters::SECURITY['secret'];
+        if($this->session->exists(\Util\MangopayUtility::SESSION_LOGIN)){
+            $pass_phrase = $this->session->get(\Util\MangopayUtility::SESSION_LOGIN).'-'.\App\Parameters::SECURITY['secret'];
         }
         if(!empty($pass_phrase) && $cookie==hash('sha256', $pass_phrase)){
             $this->logger->info('['.$ip.'] ADMIN_ALREADY_LOGGED');
