@@ -15,7 +15,7 @@ class LoginMiddleware
     public function __invoke($request, $response, $next){
         $session = $this->container->get('session');
         if(!$session->exists(\Util\MangopayUtility::SESSION_REMOTE)){
-            $this->session->set(\Util\MangopayUtility::SESSION_REMOTE,$request->getServerParam('REMOTE_ADDR'));
+            $session->set(\Util\MangopayUtility::SESSION_REMOTE,$request->getServerParam('REMOTE_ADDR'));
         }
         $hash = hash('sha256', $session->get(\Util\MangopayUtility::SESSION_LOGIN).'-'.\App\Parameters::SECURITY['secret']);
         $cookie = \Util\Tools::cookieGetValue(\Dflydev\FigCookies\FigRequestCookies::get($request, \App\Parameters::SECURITY['cookie'], 'none'));
