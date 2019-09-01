@@ -72,6 +72,7 @@ class NewUserController extends \Core\Controller
             if($client=$this->getRelatedClient()){
                 try{
                     $user = new User();
+                    $user->active = 1;
                     $user->name = $datas['domain'];
                     $user->email = $datas['email'];
                     $user->uuid = \Util\UuidGenerator::v4();
