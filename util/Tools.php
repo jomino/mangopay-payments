@@ -11,4 +11,15 @@ class Tools
         return $key_value[1];
     }
 
+    public static function queryGetValues($params)
+    {
+        $raw = [];
+        $values = explode('&',$params);
+        foreach ($values as $value) {
+            $param = explode('=',$value);
+            $raw[$param[0]] = urldecode($param[1]);
+        }
+        return $raw;
+    }
+
 }
