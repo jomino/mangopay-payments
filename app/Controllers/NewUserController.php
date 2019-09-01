@@ -31,17 +31,17 @@ class NewUserController extends \Core\Controller
 
             if($user=$this->createNewUser($datas)){
                 $uri = $request->getUri();
-                $register_link = $uri->getScheme().'://'.$uri->getHost().$this->router->pathFor('register',[
+                /* $register_link = $uri->getScheme().'://'.$uri->getHost().$this->router->pathFor('register',[
                     'id' => $user->id,
                     'token' => '?'.$user->uuid
                 ]);
-                if($this->sendUserMail($register_link,$user)){
-                    $this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> '.$email);
-                    $this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> REGISTER_URL:'.$register_link);
+                if($this->sendUserMail($register_link,$user)){ */
+                    $this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> '.$user->email);
+                    //$this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> REGISTER_URL:'.$register_link);
                     $datas['generated_link'] = $uri->getScheme().'://'.$uri->getHost().'/'.$user->uuid.'/';
-                }else{
+                /* }else{
                     $user->delete();
-                }
+                } */
             }
 
             if(sizeof($this->errors)>0){
@@ -78,7 +78,7 @@ class NewUserController extends \Core\Controller
                     $user->ukey = $datas['ukey'];
                     $user->wkey = $datas['wkey'];
                     $user->bkey = $datas['bkey'];
-                    $user->client()->save($client);
+                    $user->client()->associate($client);
                     $user->save();
                     return $user;
                 }catch(\Exception $e){
