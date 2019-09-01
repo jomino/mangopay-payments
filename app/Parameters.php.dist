@@ -11,7 +11,7 @@ class Parameters
     const DATABASE = [
         'driver' => 'mysql',
         'host' => 'localhost',
-        'database' => 'hipay_payments',
+        'database' => 'mangopay_payments',
         'username' => '',
         'password' => '',
         'charset' => 'utf8',
