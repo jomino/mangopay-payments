@@ -40,6 +40,7 @@
                             Voici l'adresse de base du lien pour initier toute transaction de payement depuis le site du vendeur.
                         {%- endif -%}
                     </p>
+                    <div class="clearfix"></div>
                     <div class="input-group generated-link">
                         <input type="text" class="form-control" name="generated-link" value="{%- if not error -%}{{ generated_link }}{%- endif -%}"{%- if error %} disabled{%- endif -%}>
                         <div class="input-group-addon{%- if not error %} clickable{%- endif -%}">
