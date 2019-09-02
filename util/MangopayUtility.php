@@ -22,20 +22,6 @@ class MangopayUtility
     const SESSION_PRODUCT = 'product_ref';
     const SESSION_METHOD = 'payment_type';
     const SESSION_TOKEN = 'event_token';
-    const SESSION_OAUTH = 'bearer_token';
-    const SESSION_TIMEOUT = 'bearer_timeout';
-
-    const EVENT_PAYIN_CREATED = 'PAYIN_NORMAL_CREATED';
-    const EVENT_PAYIN_SUCCEEDED = 'PAYIN_NORMAL_SUCCEEDED';
-    const EVENT_PAYIN_FAILED = 'PAYIN_NORMAL_FAILED';
-
-    const EVENT_PAYOUT_CREATED = 'PAYOUT_NORMAL_CREATED';
-    const EVENT_PAYOUT_SUCCEEDED = 'PAYOUT_NORMAL_SUCCEEDED';
-    const EVENT_PAYOUT_FAILED = 'PAYOUT_NORMAL_FAILED';
-
-    const EVENT_TRANSFER_CREATED = 'TRANSFER_NORMAL_CREATED';
-    const EVENT_TRANSFER_SUCCEEDED = 'TRANSFER_NORMAL_SUCCEEDED';
-    const EVENT_TRANSFER_FAILED = 'TRANSFER_NORMAL_FAILED';
 
     public static function createWebhooks($ckey,$akey,$wh_url,$tmp_dir)
     {
@@ -47,15 +33,15 @@ class MangopayUtility
         $api->Config->TemporaryFolder = $tmp_dir;
 
         $events = [
-            static::EVENT_PAYIN_CREATED,
-            static::EVENT_PAYIN_SUCCEEDED,
-            static::EVENT_PAYIN_FAILED,
-            static::EVENT_PAYOUT_CREATED,
-            static::EVENT_PAYOUT_SUCCEEDED,
-            static::EVENT_PAYOUT_FAILED,
-            static::EVENT_TRANSFER_CREATED,
-            static::EVENT_TRANSFER_SUCCEEDED,
-            static::EVENT_TRANSFER_FAILED
+            \MangoPay\EventType::PayinNormalCreated,
+            \MangoPay\EventType::PayinNormalSucceeded,
+            \MangoPay\EventType::PayinNormalFailed,
+            \MangoPay\EventType::PayoutNormalCreated,
+            \MangoPay\EventType::PayoutNormalSucceeded,
+            \MangoPay\EventType::PayoutNormalFailed,
+            \MangoPay\EventType::TransferNormalCreated,
+            \MangoPay\EventType::TransferNormalSucceeded,
+            \MangoPay\EventType::TransferNormalFailed
         ];
 
         $success = true;
@@ -81,6 +67,260 @@ class MangopayUtility
         } catch(\MangoPay\Libraries\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    public static function createUser($ckey,$akey,$tmp_dir,$options=[])
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        switch($options['PersonType']){
+            case \MangoPay\PersonType::Natural:
+                $user = new \MangoPay\UserNatural();
+                $udatas = [
+                    'PersonType',
+                    'KYCLevel',
+                    'FirstName',
+                    'LastName',
+                    'Birthday',
+                    'Nationality',
+                    'CountryOfResidence',
+                    'Email'
+                ];
+            break;
+            case \MangoPay\PersonType::Legal:
+                $user = new \MangoPay\UserLegal();
+                $udatas = [
+                    'PersonType',
+                    'KYCLevel',
+                    'LegalPersonType',
+                    'Name',
+                    'Email',
+                    'LegalRepresentativeBirthday',
+                    'LegalRepresentativeNationality',
+                    'LegalRepresentativeCountryOfResidence',
+                    'LegalRepresentativeFirstName',
+                    'LegalRepresentativeLastName'
+                ];
+            break;
+            default:
+                return false;
+        }
+
+        if(sizeof($options)==sizeof($udatas)){
+
+            foreach ($udatas as $key) {
+                if(isset($options[$key]) && property_exists(get_class($user),$key)){
+                    $user->{$key} = $options[$key];
+                }
+            }
+
+            try {
+                $response = $api->Users->create($user);
+                return (int) $response->Id;
+            } catch(MangoPay\Libraries\ResponseException $e) {
+                return $e->getMessage();
+            } catch(MangoPay\Libraries\Exception $e) {
+                return $e->getMessage();
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public static function createWallet($ckey,$akey,$ukey,$tmp_dir)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        $wallet = new \MangoPay\Wallet();
+        $wallet->Owners = [$ukey];
+        $wallet->Currency = static::DEFAULT_CURRENCY;
+        $wallet->Description = 'IPEFIX_PAYMENTS_SOLUTION';
+
+        try {
+            $response = $api->Wallets->Create($wallet);
+            return $response;
+        } catch(MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+        return false;
+
+    }
+
+    public static function createPayin($ckey,$akey,$tmp_dir,$options=[])
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        $udatas = [
+            'PaymentType',
+            'ExecutionType',
+            'ReturnURL',
+            'AuthorId',
+            'DebitedFunds',
+            'Fees',
+            'CardType',
+            'CreditedWalletId',
+            'Culture'
+        ];
+
+        $payin = new \MangoPay\PayIn();
+
+        if(sizeof($options)==sizeof($udatas)){
+
+            foreach ($udatas as $key) {
+                if(isset($options[$key]) && property_exists(get_class($payin),$key)){
+                    switch(true){
+                        case in_array($key,['DebitedFunds','Fees']):
+                            $money = new \MangoPay\Money();
+                            $money->Amount = $options[$key];
+                            $money->Currency = static::DEFAULT_CURRENCY;
+                            $payin->{$key} = $money;
+                        break;
+                        default:
+                            $payin->{$key} = $options[$key];
+
+                    }
+                }
+            }
+
+            try {
+                $response = $api->PayIns->Create($payin);
+                return $response;
+            } catch(MangoPay\Libraries\ResponseException $e) {
+                return $e->getMessage();
+            } catch(MangoPay\Libraries\Exception $e) {
+                return $e->getMessage();
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public static function createTransfer($ckey,$akey,$tmp_dir,$options=[])
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        $udatas = [
+            'AuthorId',
+            'DebitedFunds',
+            'Fees',
+            'DebitedWalletId',
+            'CreditedWalletId'
+        ];
+
+        $transfer = new \MangoPay\Transfer();
+
+        if(sizeof($options)==sizeof($udatas)){
+
+            foreach ($udatas as $key) {
+                if(isset($options[$key]) && property_exists(get_class($transfer),$key)){
+                    switch(true){
+                        case in_array($key,['DebitedFunds','Fees']):
+                            $money = new \MangoPay\Money();
+                            $money->Amount = $options[$key];
+                            $money->Currency = static::DEFAULT_CURRENCY;
+                            $transfer->{$key} = $money;
+                        break;
+                        default:
+                            $transfer->{$key} = $options[$key];
+
+                    }
+                }
+            }
+
+            try {
+                $response = $api->Transfers->Create($transfer);
+                return $response;
+            } catch(MangoPay\Libraries\ResponseException $e) {
+                return $e->getMessage();
+            } catch(MangoPay\Libraries\Exception $e) {
+                return $e->getMessage();
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public static function createPayout($ckey,$akey,$tmp_dir,$options=[])
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        $udatas = [
+            'AuthorId',
+            'PaymentType',
+            'BankWireRef',
+            'BankAccountId',
+            'DebitedFunds',
+            'Fees',
+            'DebitedWalletId'
+        ];
+
+        $payout = new \MangoPay\PayOut();
+
+        if(sizeof($options)==sizeof($udatas)){
+
+            foreach ($udatas as $key) {
+                if(isset($options[$key]) && property_exists(get_class($payout),$key)){
+                    switch(true){
+                        case in_array($key,['DebitedFunds','Fees']):
+                            $money = new \MangoPay\Money();
+                            $money->Amount = $options[$key];
+                            $money->Currency = static::DEFAULT_CURRENCY;
+                            $payout->{$key} = $money;
+                        break;
+                        default:
+                            $payout->{$key} = $options[$key];
+
+                    }
+                }
+            }
+
+            try {
+                $response = $api->PayOuts->Create($payout);
+                return $response;
+            } catch(MangoPay\Libraries\ResponseException $e) {
+                return $e->getMessage();
+            } catch(MangoPay\Libraries\Exception $e) {
+                return $e->getMessage();
+            }
+
+        }
+
+        return false;
+
     }
 
 }
