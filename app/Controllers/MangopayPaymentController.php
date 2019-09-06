@@ -26,7 +26,7 @@ class MangopayPaymentController extends \Core\Controller
             ]);
         }else{
             $this->logger->info('['.$ip.'] NOT_VALID_USER_REFERRER -> TOKEN: '.$token);
-            return $response->write($this->getSecurityAlert('NOT_VALID_USER_REFERRER'));
+            return $response->write($this->getSecurityAlert('NOT_VALID_USER '.$token.' WITH '.$this->session->get(\Util\MangopayUtility::SESSION_DOMAIN)));
         }
     }
 
@@ -267,7 +267,6 @@ class MangopayPaymentController extends \Core\Controller
         }elseif($this->session->exists(\Util\MangopayUtility::SESSION_REFERRER)){
             $s_token = $this->session->get(\Util\MangopayUtility::SESSION_REFERRER);
         }
-        $this->logger->info('['.$ip.'] GET_USER -> TOKEN: '.$s_token);
         try{
             $user = \App\Models\User::where('uuid',$s_token)->firstOrFail();
             return $user;
@@ -283,12 +282,8 @@ class MangopayPaymentController extends \Core\Controller
         if(is_null($user)){ $user = $this->getCurrentUser(); }
         if($this->session->exists(\Util\MangopayUtility::SESSION_DOMAIN)){
             $domain = $this->session->get(\Util\MangopayUtility::SESSION_DOMAIN);
-            $this->logger->info('['.$ip.'] USER_VALIDATE -> DOMAIN: '.$domain);
-            $this->logger->info('['.$ip.'] USER_NAME -> '.$user->name);
-            $this->logger->info('['.$ip.'] USER_ACTIVE -> '.$user->active);
             return $user->name==$domain && (int) $user->active==1;
         }
-        $this->logger->info('['.$ip.'] SESSION_DOMAIN_NOT_FOUND');
         return false;
     }
 
