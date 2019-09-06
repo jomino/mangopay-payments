@@ -80,17 +80,17 @@ body {
     margin-bottom: -1px;
 }
 
-.main .content .form-group button.btn,
-.main .content .form-group button.btn-sm,
-.main .content .form-group button.btn-default {
+.main .content button.btn,
+.main .content button.btn-sm,
+.main .content button.btn-default {
     outline: none;
     font-size: inherit;
     color: #3B4856 !important;
 }
 
-.main .content .form-group button.btn:hover,
-.main .content .form-group button.btn-sm:hover,
-.main .content .form-group button.btn-default:hover  {
+.main .content button.btn:hover,
+.main .content button.btn-sm:hover,
+.main .content button.btn-default:hover  {
     color: #006699 !important;
 }
 

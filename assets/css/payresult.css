@@ -1,0 +1,82 @@
+
+@media (min-width: 768px) {
+    .main .content-left .loader-container {
+        width: 35px;
+        height: 35px;
+        padding: 5px 5px;
+    }
+    .main .content-left .result-container {
+        margin-top: 5px;
+        padding-bottom: 5px;
+        min-height: 40px;
+        vertical-align: middle; 
+    }
+    .main .content-right p {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    .main .content-right .detail {
+        margin-top: 10px;
+    }
+    #print-container {
+        visibility: hidden;
+    }
+}
+@media (min-width: 377px) and  (max-width: 767px) {
+    .main .content-left .loader-container {
+        width: 25px;
+        height: 25px;
+        padding: 2px 2px;
+    }
+    .main .content-left .result-container {
+        margin-top: 5px;
+        padding-bottom: 5px;
+        min-height: 25px;
+        vertical-align: middle; 
+    }
+    .main .content-left button {
+        display: none;
+    }
+    .main .content-right .detail {
+        margin-top: 10px;
+    }
+    #print-container {
+        visibility: hidden;
+    }
+}
+@media (max-width: 376px) {
+    .main .content-left .loader-container {
+        width: 25px;
+        height: 25px;
+        padding: 2px 2px;
+    }
+    .main .content-left .result-container {
+        margin-top: 5px;
+        padding-bottom: 5px;
+        min-height: 25px;
+        vertical-align: middle; 
+    }
+    .main .content-left button {
+        display: none;
+    }
+    .main .content-right .detail {
+        margin-top: 10px;
+    }
+    #print-container {
+        visibility: hidden;
+    }
+}
+
+@media print {
+    body{
+        width: 21cm;
+        height: 29.7cm;
+        margin: 30mm 45mm 30mm 45mm;
+    }
+    .main{
+        visibility: hidden;
+    }
+    #print-container {
+        visibility: visible;
+    }
+}

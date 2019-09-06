@@ -22,6 +22,9 @@ class HttpReferrerMiddleware
             $domain = preg_replace('#^(?:http[s]?://)?([a-z0-9\-._~%]+)(?:/?.*)$#i','$1',$domain);
             $session->set(\Util\MangopayUtility::SESSION_DOMAIN,$domain);
         }
+        if(!$session->exists(\Util\MangopayUtility::SESSION_REMOTE)){
+            $session->set(\Util\MangopayUtility::SESSION_REMOTE,$request->getServerParam('REMOTE_ADDR'));
+        }
         return $next($request, $response);
     }
 

@@ -5,10 +5,10 @@ namespace Util;
 class MangopayUtility
 {
 
-    const METHOD_BANCONTACT = 'bancontact';
-    const METHOD_SOFORT = 'sofort';
-    const METHOD_IDEAL = 'ideal';
-    const METHOD_IBAN = 'iban';
+    const METHOD_BANCONTACT = 'BCMC';
+    const METHOD_SOFORT = 'SOFORT';
+    const METHOD_IDEAL = 'IDEAL';
+    // const METHOD_IBAN = 'iban';
 
     const DEFAULT_CURRENCY = 'EUR';
     const DEFAULT_COUNTRY = 'BE';
@@ -22,6 +22,11 @@ class MangopayUtility
     const SESSION_PRODUCT = 'product_ref';
     const SESSION_METHOD = 'payment_type';
     const SESSION_TOKEN = 'event_token';
+
+    const SESSION_PERSON_TYPE = 'person_type';
+    const SESSION_PERSON_EMAIL = 'person_email';
+    const SESSION_PERSON_NATIONALITY = 'person_nationality';
+    const SESSION_PERSON_RESIDENCE = 'person_residence';
 
     public static function createWebhooks($ckey,$akey,$wh_url,$tmp_dir)
     {
@@ -150,7 +155,7 @@ class MangopayUtility
 
         try {
             $response = $api->Wallets->Create($wallet);
-            return $response;
+            return $response->Id;
         } catch(MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
         } catch(MangoPay\Libraries\Exception $e) {
@@ -177,10 +182,15 @@ class MangopayUtility
             'AuthorId',
             'DebitedFunds',
             'Fees',
-            'CardType',
             'CreditedWalletId',
             'Culture'
         ];
+
+        if(isset($options['PaymentType']) && $options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
+            array_push($udatas,'DirectDebitType');
+        }else{
+            array_push($udatas,'CardType');
+        }
 
         $payin = new \MangoPay\PayIn();
 
@@ -214,6 +224,26 @@ class MangopayUtility
         }
 
         return false;
+
+    }
+
+    public static function getPayin($ckey,$akey,$tmp_dir,$pikey)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->PayIns->Get($pikey);
+            return $response;
+        } catch(MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
 
     }
 
@@ -269,6 +299,26 @@ class MangopayUtility
 
     }
 
+    public static function getTransfer($ckey,$akey,$tmp_dir,$trkey)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->Transfers->Get($trkey);
+            return $response;
+        } catch(MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
     public static function createPayout($ckey,$akey,$tmp_dir,$options=[])
     {
         $api = new \MangoPay\MangoPayApi();
@@ -320,6 +370,26 @@ class MangopayUtility
         }
 
         return false;
+
+    }
+
+    public static function getPayout($ckey,$akey,$tmp_dir,$pokey)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->PayOuts->Get($pokey);
+            return $response;
+        } catch(MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
 
     }
 

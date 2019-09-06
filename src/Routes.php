@@ -28,6 +28,22 @@ class Routes
         
         // Webhook
         $app->get('/1/{token:[0-9a-zA-Z-]*}', \App\Controllers\MangopayWebhookController::class)->setName('webhooks');
+        
+        // Payments
+        $app->group( '', function($app){
+            $app->get('/{token:[0-9a-zA-Z-]*}/{amount:[0-9]*}/{product:[0-9a-zA-Z-_]+}', \App\Controllers\MangopayPaymentController::class.':start')->setName('payment_start');
+            $app->post('/identify', \App\Controllers\MangopayPaymentController::class.':identify')->setName('payment_identify');
+            $app->post('/finalize', \App\Controllers\MangopayPaymentController::class.':finalize')->setName('payment_finalize');
+        })->add($container->get('csrf'))->add(new \App\Middleware\HttpReferrerMiddleware($app));
+        
+        // return url
+        $app->get('/redirect/{token:[0-9a-zA-Z-]*}', \App\Controllers\MangopayPaymentController::class.':redirect')->setName('payment_redirect');
+
+        // check url
+        $app->get('/check/{token:[0-9a-zA-Z-]*}', \App\Controllers\MangopayPaymentController::class.':check')->setName('payment_check');
+
+        // print url
+        $app->get('/print/{token:[0-9a-zA-Z-]*}', \App\Controllers\MangopayPaymentController::class.':print')->setName('payment_print');
 
         // Infos
         $app->get('/infos', function($request, $response, $args){
