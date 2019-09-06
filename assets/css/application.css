@@ -170,6 +170,7 @@ body {
         max-height: 100%;
     }
     .main .content .content-right p {
+        margin-top: 12px;
         max-width: 300px;
     }
     .main .content .content-right .img-logo {
