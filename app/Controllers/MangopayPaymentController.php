@@ -261,15 +261,18 @@ class MangopayPaymentController extends \Core\Controller
 
     private function getCurrentUser($token='')
     {
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(!empty($token)){
             $s_token = $token;
         }elseif($this->session->exists(\Util\MangopayUtility::SESSION_REFERRER)){
             $s_token = $this->session->get(\Util\MangopayUtility::SESSION_REFERRER);
         }
+        $this->logger->info('['.$ip.'] GET_USER -> TOKEN: '.$s_token);
         try{
             $user = \App\Models\User::where('uuid',$s_token)->firstOrFail();
             return $user;
         }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $e){
+            $this->logger->info('['.$ip.'] USER_NOT_FOUND -> ERROR: '.$e->getMessage());
             return null;
         }
     }
