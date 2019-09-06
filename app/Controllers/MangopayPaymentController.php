@@ -25,7 +25,7 @@ class MangopayPaymentController extends \Core\Controller
                 'amount' => $display_amount.' &euro;'
             ]);
         }else{
-            $this->logger->info('['.$ip.'] NOT_VALID_USER_REFERRER -> INVALID_USER');
+            $this->logger->info('['.$ip.'] NOT_VALID_USER_REFERRER -> TOKEN: '.$token);
             return $response->write($this->getSecurityAlert('NOT_VALID_USER_REFERRER'));
         }
     }
