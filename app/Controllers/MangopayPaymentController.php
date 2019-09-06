@@ -276,11 +276,16 @@ class MangopayPaymentController extends \Core\Controller
 
     private function isValidUser($user=null)
     {
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(is_null($user)){ $user = $this->getCurrentUser(); }
         if($this->session->exists(\Util\MangopayUtility::SESSION_DOMAIN)){
             $domain = $this->session->get(\Util\MangopayUtility::SESSION_DOMAIN);
+            $this->logger->info('['.$ip.'] USER_VALIDATE -> DOMAIN: '.$domain);
+            $this->logger->info('['.$ip.'] USER_NAME -> '.$user->name);
+            $this->logger->info('['.$ip.'] USER_ACTIVE -> '.$user->active);
             return $user->name==$domain && (int) $user->active==1;
         }
+        $this->logger->info('['.$ip.'] SESSION_DOMAIN_NOT_FOUND');
         return false;
     }
 
