@@ -41,10 +41,26 @@ class MangopayPaymentController extends \Core\Controller
             $this->logger->info('['.$ip.'] NOT_VALID_USER_REFERRER -> EXIT_WITH_403');
             return $response->write($this->getSecurityAlert('NOT_VALID_USER_REFERRER'))->withStatus(403);
         }
+        $payment_type = $request->getParsedBodyParam('payment-type');
+        $this->setSessionVar(\Util\MangopayUtility::SESSION_METHOD,$payment_type);
+        $this->logger->info('['.$ip.'] PAYMENT_START_IDENTIFY -> METHOD_TYPE: '.$payment_type);
+        return $this->view->render($response, 'Home/payidentify.html.twig');
+    }
+
+    public function legal($request, $response, $args)
+    {
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
+        if(false === $request->getAttribute('csrf_status')){
+            $this->logger->info('['.$ip.'] PAYMENT_CSRF_ERROR -> EXIT_WITH_403');
+            return $response->write($this->getSecurityAlert('CSRF_ERROR'))->withStatus(403);
+        }
+        if(!$this->isValidUser()){
+            $this->logger->info('['.$ip.'] NOT_VALID_USER_REFERRER -> EXIT_WITH_403');
+            return $response->write($this->getSecurityAlert('NOT_VALID_USER_REFERRER'))->withStatus(403);
+        }
         $data = [];
         $user = $this->getCurrentUser();
         $person_email = $request->getParsedBodyParam('person-email');
-        $payment_type = $request->getParsedBodyParam('payment-type');
         $is_buyer = $user->buyers()->where('email',$person_email)->count() > 0;
         if($is_buyer){
             $buyer = $user->buyers()->where('email',$person_email)->get();
@@ -63,19 +79,15 @@ class MangopayPaymentController extends \Core\Controller
             $person_nationality = $request->getParsedBodyParam('person-national');
             $person_residence = $request->getParsedBodyParam('person-residence');
         }
-        $this->setSessionVar(\Util\MangopayUtility::SESSION_METHOD,$payment_type);
         $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_TYPE,$person_type);
         $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_EMAIL,$person_email);
         $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_NATIONALITY,$person_nationality);
         $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_RESIDENCE,$person_residence);
-        $this->logger->info('['.$ip.'] PAYMENT_START_IDENTIFY -> METHOD_TYPE: '.$payment_type);
-        $this->logger->info('['.$ip.'] PAYMENT_START_IDENTIFY -> PERSON_TYPE: '.$person_type);
+        $this->logger->info('['.$ip.'] PAYMENT_START_LEGAL -> PERSON_TYPE: '.$person_type);
         switch($person_type){
             case \MangoPay\PersonType::Legal:
-                $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_TYPE,\MangoPay\PersonType::Legal);
                 return $this->view->render($response, 'Home/payidentify-legal.html.twig',$data);
             case \MangoPay\PersonType::Natural:
-                $this->setSessionVar(\Util\MangopayUtility::SESSION_PERSON_TYPE,\MangoPay\PersonType::Natural);
                 return $this->view->render($response, 'Home/payidentify-natural.html.twig',$data);
         }
     }

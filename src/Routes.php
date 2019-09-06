@@ -33,6 +33,7 @@ class Routes
         $app->group( '', function($app){
             $app->get('/{token:[0-9a-zA-Z-]*}/{amount:[0-9]*}/{product:[0-9a-zA-Z-_]+}', \App\Controllers\MangopayPaymentController::class.':start')->setName('payment_start');
             $app->post('/identify', \App\Controllers\MangopayPaymentController::class.':identify')->setName('payment_identify');
+            $app->post('/legal', \App\Controllers\MangopayPaymentController::class.':legal')->setName('payment_legal');
             $app->post('/finalize', \App\Controllers\MangopayPaymentController::class.':finalize')->setName('payment_finalize');
         })->add($container->get('csrf'))->add(new \App\Middleware\HttpReferrerMiddleware($app));
         
