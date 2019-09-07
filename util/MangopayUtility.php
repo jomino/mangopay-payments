@@ -158,7 +158,7 @@ class MangopayUtility
 
         try {
             $response = $api->Wallets->Create($wallet);
-            return $response->Id;
+            return (int) $response->Id;
         } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
         } catch(\MangoPay\Libraries\Exception $e) {
