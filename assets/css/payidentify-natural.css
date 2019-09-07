@@ -1,14 +1,14 @@
 
 @media (min-width: 768px) {
     .main .border-right {
-        min-height: 270px !important;
+        min-height: 240px !important;
     }
     .main .border-left {
-        min-height: 270px !important;
+        min-height: 240px !important;
     }
     .main .content-right .form-container {
         width: 270px;
-        margin-top: 25px;
+        margin-top: 20px;
     }
     .main .content-right .form-group {
         margin-bottom: 10px;
