@@ -82,13 +82,16 @@ class MangopayUtility
         $api->Config->ClientId = $ckey;
         $api->Config->ClientPassword = $akey;
         $api->Config->TemporaryFolder = $tmp_dir;
+        
+        $default_datas = [
+            'PersonType',
+            'KYCLevel'
+        ];
 
         switch($options['PersonType']){
             case \MangoPay\PersonType::Natural:
                 $user = new \MangoPay\UserNatural();
                 $udatas = [
-                    'PersonType',
-                    'KYCLevel',
                     'FirstName',
                     'LastName',
                     'Birthday',
@@ -100,11 +103,9 @@ class MangopayUtility
             case \MangoPay\PersonType::Legal:
                 $user = new \MangoPay\UserLegal();
                 $udatas = [
-                    'PersonType',
-                    'KYCLevel',
-                    'LegalPersonType',
                     'Name',
                     'Email',
+                    'LegalPersonType',
                     'LegalRepresentativeBirthday',
                     'LegalRepresentativeNationality',
                     'LegalRepresentativeCountryOfResidence',
@@ -115,6 +116,8 @@ class MangopayUtility
             default:
                 return false;
         }
+
+        $udatas = array_merge($udatas,$default_datas);
 
         if(sizeof($options)==sizeof($udatas)){
 
