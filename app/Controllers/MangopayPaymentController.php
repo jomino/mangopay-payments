@@ -113,7 +113,7 @@ class MangopayPaymentController extends \Core\Controller
                         $ckey = $client->ckey;
                         $person_type = $buyer->person_type;
                         $this->logger->info('['.$ip.'] CREATED_BUYER_CLIENT -> ID: '.$client->id);
-                        $kyc_level = \Mangopay\KycLevel::Light;
+                        $kyc_level = \MangoPay\KycLevel::Light;
                         switch($person_type){
                             case \MangoPay\PersonType::Legal:
                                 $buyer_options = [
