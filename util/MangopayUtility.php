@@ -119,7 +119,7 @@ class MangopayUtility
         if(sizeof($options)==sizeof($udatas)){
 
             foreach ($udatas as $key) {
-                if(isset($options[$key]) && property_exists(get_class($user),$key)){
+                if(isset($options[$key])){
                     $user->{$key} = $options[$key];
                 }
             }
@@ -127,9 +127,9 @@ class MangopayUtility
             try {
                 $response = $api->Users->create($user);
                 return (int) $response->Id;
-            } catch(MangoPay\Libraries\ResponseException $e) {
+            } catch(\MangoPay\Libraries\ResponseException $e) {
                 return $e->getMessage();
-            } catch(MangoPay\Libraries\Exception $e) {
+            } catch(\MangoPay\Libraries\Exception $e) {
                 return $e->getMessage();
             }
 
@@ -156,9 +156,9 @@ class MangopayUtility
         try {
             $response = $api->Wallets->Create($wallet);
             return $response->Id;
-        } catch(MangoPay\Libraries\ResponseException $e) {
+        } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
-        } catch(MangoPay\Libraries\Exception $e) {
+        } catch(\MangoPay\Libraries\Exception $e) {
             return $e->getMessage();
         }
 
@@ -215,9 +215,9 @@ class MangopayUtility
             try {
                 $response = $api->PayIns->Create($payin);
                 return $response;
-            } catch(MangoPay\Libraries\ResponseException $e) {
+            } catch(\MangoPay\Libraries\ResponseException $e) {
                 return $e->getMessage();
-            } catch(MangoPay\Libraries\Exception $e) {
+            } catch(\MangoPay\Libraries\Exception $e) {
                 return $e->getMessage();
             }
 
@@ -239,9 +239,9 @@ class MangopayUtility
         try {
             $response = $api->PayIns->Get($pikey);
             return $response;
-        } catch(MangoPay\Libraries\ResponseException $e) {
+        } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
-        } catch(MangoPay\Libraries\Exception $e) {
+        } catch(\MangoPay\Libraries\Exception $e) {
             return $e->getMessage();
         }
 
@@ -287,9 +287,9 @@ class MangopayUtility
             try {
                 $response = $api->Transfers->Create($transfer);
                 return $response;
-            } catch(MangoPay\Libraries\ResponseException $e) {
+            } catch(\MangoPay\Libraries\ResponseException $e) {
                 return $e->getMessage();
-            } catch(MangoPay\Libraries\Exception $e) {
+            } catch(\MangoPay\Libraries\Exception $e) {
                 return $e->getMessage();
             }
 
@@ -311,9 +311,9 @@ class MangopayUtility
         try {
             $response = $api->Transfers->Get($trkey);
             return $response;
-        } catch(MangoPay\Libraries\ResponseException $e) {
+        } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
-        } catch(MangoPay\Libraries\Exception $e) {
+        } catch(\MangoPay\Libraries\Exception $e) {
             return $e->getMessage();
         }
 
@@ -361,9 +361,9 @@ class MangopayUtility
             try {
                 $response = $api->PayOuts->Create($payout);
                 return $response;
-            } catch(MangoPay\Libraries\ResponseException $e) {
+            } catch(\MangoPay\Libraries\ResponseException $e) {
                 return $e->getMessage();
-            } catch(MangoPay\Libraries\Exception $e) {
+            } catch(\MangoPay\Libraries\Exception $e) {
                 return $e->getMessage();
             }
 
@@ -385,9 +385,9 @@ class MangopayUtility
         try {
             $response = $api->PayOuts->Get($pokey);
             return $response;
-        } catch(MangoPay\Libraries\ResponseException $e) {
+        } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
-        } catch(MangoPay\Libraries\Exception $e) {
+        } catch(\MangoPay\Libraries\Exception $e) {
             return $e->getMessage();
         }
 
