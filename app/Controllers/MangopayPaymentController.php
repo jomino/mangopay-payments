@@ -141,33 +141,33 @@ class MangopayPaymentController extends \Core\Controller
                                     'Email' => $buyer->email
                                 ];
                             break;
-                            $this->logger->info('['.$ip.'] CREATED_BUYER_USER -> DATA ',$buyer_options);
-                            /* $buyer_response = \Util\MangopayUtility::createUser($ckey,$akey,$settings['tempdir'],$buyer_options);
-                            if(is_int($buyer_response)){
-                                $buyer->ukey = $buyer_response;
-                                $wallet_response = \Util\MangopayUtility::createWallet($ckey,$akey,$buyer_response,$settings['tempdir']);
-                                if(is_int($wallet_response)){
-                                    $buyer->wkey = $wallet_response;
-                                    $buyer->save();
-                                }else{
-                                    $error = $wallet_response;
-                                }
+                        }
+                        $this->logger->info('['.$ip.'] CREATED_BUYER_USER -> DATA ',$buyer_options);
+                        $buyer_response = \Util\MangopayUtility::createUser($ckey,$akey,$settings['tempdir'],$buyer_options);
+                        if(is_int($buyer_response)){
+                            $buyer->ukey = $buyer_response;
+                            $wallet_response = \Util\MangopayUtility::createWallet($ckey,$akey,$buyer_response,$settings['tempdir']);
+                            if(is_int($wallet_response)){
+                                $buyer->wkey = $wallet_response;
+                                $buyer->save();
                             }else{
-                                $error = $buyer_response;
-                            } */
+                                $error = $wallet_response;
+                            }
+                        }else{
+                            $error = $buyer_response;
                         }
                     }
                     if(empty($error)){
                         $event = $this->createNewEvent($buyer);
                         $this->logger->info('['.$ip.'] CREATED_BUYER_EVENT -> ID: '.$event->id);
-                        /* $payin_response = $this->createNewPayin($event,$buyer,$request->getUri());
-                        if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){ */
+                        $payin_response = $this->createNewPayin($event,$buyer,$request->getUri());
+                        if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
                             return $this->view->render($response, 'Home/payredir.html.twig',[
-                                'redir_url' => 'RedirectURL' //$payin_response->RedirectURL
+                                'redir_url' => $payin_response->RedirectURL
                             ]);
-                        /* }else{
+                        }else{
                             $error = is_string($payin_response) ? $payin_response:$payin_response->ResultMessage??'UNKNOW_ERROR';
-                        } */
+                        }
                     }
                 }
             }
