@@ -161,11 +161,11 @@ class MangopayPaymentController extends \Core\Controller
                         $event = $this->createNewEvent($buyer);
                         $this->logger->info('['.$ip.'] CREATED_BUYER_EVENT -> ID: '.$event->id);
                         /* $payin_response = $this->createNewPayin($event,$buyer,$request->getUri());
-                        if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
+                        if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){ */
                             return $this->view->render($response, 'Home/payredir.html.twig',[
-                                'redir_url' => $payin_response->RedirectURL
+                                'redir_url' => 'RedirectURL' //$payin_response->RedirectURL
                             ]);
-                        }else{
+                        /* }else{
                             $error = is_string($payin_response) ? $payin_response:$payin_response->ResultMessage??'UNKNOW_ERROR';
                         } */
                     }
