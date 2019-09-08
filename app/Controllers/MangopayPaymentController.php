@@ -164,7 +164,7 @@ class MangopayPaymentController extends \Core\Controller
                         if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
                             $this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
                             return $this->view->render($response, 'Home/payredir.html.twig',[
-                                'redir_url' => $payin_response->RedirectURL
+                                'redir_url' => \stripslashes($payin_response->ExecutionDetails->RedirectURL)
                             ]);
                         }else{
                             $error = is_string($payin_response) ? $payin_response:$payin_response->ResultMessage??'UNKNOW_ERROR';
