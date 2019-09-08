@@ -63,7 +63,7 @@ class MangopayPaymentController extends \Core\Controller
         $person_email = $request->getParsedBodyParam('person-email');
         $is_buyer = $user->buyers()->where('email',$person_email)->count() > 0;
         if($is_buyer){
-            $buyer = $user->buyers()->where('email',$person_email)->get();
+            $buyer = $user->buyers()->where('email',$person_email)->first();
             $person_type = $buyer->person_type;
             $person_nationality = $buyer->nationality;
             $person_residence = $buyer->residence;
@@ -103,7 +103,7 @@ class MangopayPaymentController extends \Core\Controller
                     $person_email = $this->session->get(\Util\MangopayUtility::SESSION_PERSON_EMAIL);
                     $is_buyer = $user->buyers()->where('email',$person_email)->count() > 0;
                     if($is_buyer){
-                        $buyer = $user->buyers()->where('email',$person_email)->get();
+                        $buyer = $user->buyers()->where('email',$person_email)->first();
                         $this->logger->info('['.$ip.'] PAYMENT_FINALIZE_FOUND_BUYER -> ID: '.$buyer->id);
                     }else{
                         $buyer = $this->createNewBuyer($user,$request->getParsedBody());
