@@ -162,6 +162,7 @@ class MangopayPaymentController extends \Core\Controller
                         $this->logger->info('['.$ip.'] CREATED_BUYER_EVENT -> ID: '.$event->id);
                         $payin_response = $this->createNewPayin($event,$request->getUri());
                         if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
+                            $this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
                             return $this->view->render($response, 'Home/payredir.html.twig',[
                                 'redir_url' => $payin_response->RedirectURL
                             ]);
