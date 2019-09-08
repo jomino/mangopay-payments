@@ -184,12 +184,10 @@ class MangopayUtility
             'Tag',
             'PaymentType',
             'ExecutionType',
-            'ReturnURL',
             'AuthorId',
             'DebitedFunds',
             'Fees',
-            'CreditedWalletId',
-            'Culture'
+            'CreditedWalletId'
         ];
 
         if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
@@ -200,41 +198,51 @@ class MangopayUtility
 
         $payin = new \MangoPay\PayIn();
 
-        if(sizeof($options)==sizeof($udatas)){
-
-            foreach ($udatas as $key) {
-                if(isset($options[$key])){
-                    switch(true){
-                        case in_array($key,['DebitedFunds','Fees']):
-                            $money = new \MangoPay\Money();
-                            $money->Amount = $options[$key];
-                            $money->Currency = static::DEFAULT_CURRENCY;
-                            $payin->{$key} = $money;
-                        break;
-                        case $key=='CardType':
-                            $card_type = new \MangoPay\PayInPaymentDetailsCard();
-                            $card_type->CardType = $options[$key];
-                            $payin->PaymentDetails = $card_type;
-                        break;
-                        default:
-                            $payin->{$key} = $options[$key];
-
+        foreach ($udatas as $key) {
+            switch(true){
+                case in_array($key,['DebitedFunds','Fees']):
+                    $money = new \MangoPay\Money();
+                    $money->Amount = $options[$key];
+                    $money->Currency = static::DEFAULT_CURRENCY;
+                    $payin->{$key} = $money;
+                break;
+                case $key=='CardType':
+                    if($options['PaymentType']==\MangoPay\PayInPaymentType::Card){
+                        $p_details = new \MangoPay\PayInPaymentDetailsCard();
+                        $p_details->CardType = $options['CardType'];
+                        $payin->PaymentDetails = $p_details;
+                        $payin->CardType = $options['CardType'];
                     }
-                }
-            }
+                    if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
+                        $p_details = new \MangoPay\PayInPaymentDetailsDirectDebit();
+                        $p_details->DirectDebitType = $options['DirectDebitType'];
+                        $payin->PaymentDetails = $p_details;
+                        $payin->DirectDebitType = $options['DirectDebitType'];
+                    }
+                break;
+                case $key=='ExecutionType':
+                    if($options['PaymentType']==\MangoPay\PayInExecutionType::Web){
+                        $exe_type = new \MangoPay\PayInExecutionDetailsWeb();
+                        $exe_type->ReturnURL = $options['ReturnURL'];
+                        $exe_type->Culture = $options['Culture'];
+                        $payin->ExecutionDetails = $exe_type;
+                        $payin->{$key} = $options[$key];
+                    }
+                break;
+                default:
+                    $payin->{$key} = $options[$key];
 
-            try {
-                $response = $api->PayIns->Create($payin);
-                return $response;
-            } catch(\MangoPay\Libraries\ResponseException $e) {
-                return $e->getMessage();
-            } catch(\MangoPay\Libraries\Exception $e) {
-                return $e->getMessage();
             }
-
         }
 
-        return 'INVALID_OPTIONS_PAYLOAD';
+        try {
+            $response = $api->PayIns->Create($payin);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
 
     }
 
