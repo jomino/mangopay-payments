@@ -339,6 +339,7 @@ class MangopayPaymentController extends \Core\Controller
             'token' => $event->token
         ]);
         $payin_options = array_merge( $payin_options, [
+            'Tag' => $event->token,
             'PaymentType' => $payment_type,
             'ExecutionType' => \MangoPay\PayInExecutionType::Web,
             'ReturnURL' => $return_url,

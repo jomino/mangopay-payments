@@ -12,6 +12,8 @@ class MangopayUtility
 
     const DEFAULT_CURRENCY = 'EUR';
     const DEFAULT_COUNTRY = 'BE';
+    
+    const DEFAULT_BANK_STATEMENT = 'WEB_PAYMENTS';
 
     const SESSION_LOGIN = 'client_login';
     const SESSION_REMOTE = 'remote';
@@ -179,6 +181,7 @@ class MangopayUtility
         $api->Config->TemporaryFolder = $tmp_dir;
 
         $udatas = [
+            'Tag',
             'PaymentType',
             'ExecutionType',
             'ReturnURL',
@@ -260,6 +263,7 @@ class MangopayUtility
         $api->Config->TemporaryFolder = $tmp_dir;
 
         $udatas = [
+            'Tag',
             'AuthorId',
             'DebitedFunds',
             'Fees',
@@ -332,6 +336,7 @@ class MangopayUtility
         $api->Config->TemporaryFolder = $tmp_dir;
 
         $udatas = [
+            'Tag',
             'AuthorId',
             'PaymentType',
             'BankWireRef',
