@@ -237,14 +237,14 @@ class MangopayPaymentController extends \Core\Controller
         $status = $event->status;
         $user = $event->buyer->user;
         $event_tpl = [
-            \MangoPay\EventType::PayoutNormalSucceeded => 'Email/email-pay-succeed.html.twig',
-            \MangoPay\EventType::PayoutNormalCreated => 'Email/email-pay-pending.html.twig',
-            \MangoPay\EventType::PayoutNormalFailed => 'Email/email-pay-rejected.html.twig'
+            \MangoPay\EventType::PayoutNormalSucceeded => 'Email/email-succeed.html.twig',
+            \MangoPay\EventType::PayoutNormalCreated => 'Email/email-pending.html.twig',
+            \MangoPay\EventType::PayoutNormalFailed => 'Email/email-rejected.html.twig'
         ];
 
         $template = $event_tpl[$status];
 
-        $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
+        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
 
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         
@@ -256,7 +256,7 @@ class MangopayPaymentController extends \Core\Controller
             'client_email' => $user->email,
             'amount' => $amount.' &euro;',
             'token' => $event->token,
-            'datetime' => $event_date->format('d/m/Y H:i:s'),
+            'datetime' => $event->updated_at->format('d/m/Y H:i:s'),
             'error' => ''
         ];
 
