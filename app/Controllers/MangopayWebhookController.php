@@ -20,7 +20,7 @@ class MangopayWebhookController extends \Core\Controller
         if($client=$this->getClient($c_token)){
             $ressource = $this->getRessource($client,$event_type,$ressource_id);
             $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RESSOURCE '.\json_encode($ressource));
-            if(is_object($ressource) && $ressource->ResultMessage=='Success'){
+            if(is_object($ressource)){
                 $e_token = $ressource->Tag;
                 if($event=$this->getEvent($e_token)){
                     switch($event_type){
@@ -32,6 +32,7 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalSucceeded:
                             $transfer = $this->initiateTransfer($client,$event);
+                            $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RESSOURCE '.\json_encode($transfer));
                             if(is_object($transfer) && $transfer->Status==\MangoPay\TransactionStatus::Created){
                                 $message = $event_type.' -> TRANSFER_CREATED -> ID '.$transfer->Id;
                             }else{
@@ -55,6 +56,7 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::TransferNormalSucceeded:
                             $payout = $this->initiatePayout($client,$event);
+                            $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RESSOURCE '.\json_encode($payout));
                             if(is_object($payout) && $payout->Status==\MangoPay\PayOutStatus::Created){
                                 $message = $event_type.' -> PAYOUT_CREATED -> ID '.$ressource_id;
                             }else{
