@@ -116,7 +116,7 @@ class MangopayUtility
                 ];
             break;
             default:
-                return false;
+                return 'INVALID_PERSON_TYPE';
         }
 
         $udatas = array_merge($udatas,$default_datas);
@@ -140,7 +140,7 @@ class MangopayUtility
 
         }
 
-        return false;
+        return 'INVALID_OPTIONS_PAYLOAD';
 
     }
 
@@ -167,7 +167,7 @@ class MangopayUtility
             return $e->getMessage();
         }
 
-        return false;
+        return 'UNKNOW_ERROR';
 
     }
 
@@ -192,10 +192,10 @@ class MangopayUtility
             'Culture'
         ];
 
-        if(isset($options['PaymentType']) && $options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
-            array_push($udatas,'DirectDebitType');
+        if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
+            $udatas[] = 'DirectDebitType';
         }else{
-            array_push($udatas,'CardType');
+            $udatas[] = 'CardType';
         }
 
         $payin = new \MangoPay\PayIn();
@@ -203,7 +203,7 @@ class MangopayUtility
         if(sizeof($options)==sizeof($udatas)){
 
             foreach ($udatas as $key) {
-                if(isset($options[$key]) && property_exists(get_class($payin),$key)){
+                if(isset($options[$key])){
                     switch(true){
                         case in_array($key,['DebitedFunds','Fees']):
                             $money = new \MangoPay\Money();
@@ -229,7 +229,7 @@ class MangopayUtility
 
         }
 
-        return false;
+        return 'INVALID_OPTIONS_PAYLOAD';
 
     }
 
@@ -276,7 +276,7 @@ class MangopayUtility
         if(sizeof($options)==sizeof($udatas)){
 
             foreach ($udatas as $key) {
-                if(isset($options[$key]) && property_exists(get_class($transfer),$key)){
+                if(isset($options[$key])){
                     switch(true){
                         case in_array($key,['DebitedFunds','Fees']):
                             $money = new \MangoPay\Money();
@@ -302,7 +302,7 @@ class MangopayUtility
 
         }
 
-        return false;
+        return 'INVALID_OPTIONS_PAYLOAD';
 
     }
 
@@ -351,7 +351,7 @@ class MangopayUtility
         if(sizeof($options)==sizeof($udatas)){
 
             foreach ($udatas as $key) {
-                if(isset($options[$key]) && property_exists(get_class($payout),$key)){
+                if(isset($options[$key])){
                     switch(true){
                         case in_array($key,['DebitedFunds','Fees']):
                             $money = new \MangoPay\Money();
@@ -377,7 +377,7 @@ class MangopayUtility
 
         }
 
-        return false;
+        return 'INVALID_OPTIONS_PAYLOAD';
 
     }
 
