@@ -348,7 +348,7 @@ class MangopayPaymentController extends \Core\Controller
             'DebitedFunds' => $event->amount,
             'Fees' => 0,
             'CreditedWalletId' => $buyer->wkey,
-            'Culture' => $this->language??'EN'
+            'Culture' => !empty($this->language)? \strtoupper($this->language):'EN'
         ]);
         $akey = $client->akey;
         $ckey = $client->ckey;
