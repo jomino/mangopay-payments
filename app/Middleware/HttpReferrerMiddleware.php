@@ -26,7 +26,7 @@ class HttpReferrerMiddleware
         if(!$session->exists(\Util\MangopayUtility::SESSION_REMOTE)){
             $session->set(\Util\MangopayUtility::SESSION_REMOTE,$request->getServerParam('REMOTE_ADDR'));
         }
-        $logger->info('['.$session->get(\Util\MangopayUtility::SESSION_REMOTE).'] SESSION_HTTP_REFERER -> DOMAIN: '.$session->get(\Util\MangopayUtility::SESSION_DOMAIN));
+        //$logger->info('['.$session->get(\Util\MangopayUtility::SESSION_REMOTE).'] SESSION_HTTP_REFERER -> DOMAIN: '.$session->get(\Util\MangopayUtility::SESSION_DOMAIN));
         return $next($request, $response);
     }
 

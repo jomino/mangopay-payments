@@ -10,10 +10,13 @@ class MangopayWebhookController extends \Core\Controller
         $message = 'EVENT_REQUEST_SUCCEEDED';
         $ip = $request->getServerParam('REMOTE_ADDR');
         $c_token = $args['token'];
-        $params = \Util\Tools::queryGetValues($request->getUri()->getQuery());
+        $request_query = $request->getUri()->getQuery();
+        $params = \Util\Tools::queryGetValues($request_query);
         $event_type = $params['EventType']??'';
         $ressource_id = $params['RessourceId']??'';
+        $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> REQUEST_QUERY: ',$params);
         $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> EVENT_TYPE: '.$event_type);
+        $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> RESSOURCE_ID: '.$ressource_id);
         if($client=$this->getClient($c_token)){
             $ressource = $this->getRessource($client,$event_type,$ressource_id);
             if(is_object($ressource) && $ressource->ResultMessage=='Success'){
@@ -91,11 +94,11 @@ class MangopayWebhookController extends \Core\Controller
                     $event->save();
                 }else{
                     $status = 'ERROR';
-                    $message = 'EVENT_NOT_FOUND -> TOKEN: '.$e_token;
+                    $message = 'EVENT_NOT_FOUND -> TOKEN '.$e_token;
                 }
             }else{
                 $status = 'ERROR';
-                $message = 'NOT_VALID_RESSOURCE: '.(is_string($ressource)?$ressource:$ressource->ResultMessage);
+                $message = 'NOT_VALID_RESSOURCE '.(\is_string($ressource)?$ressource:$ressource->ResultMessage);
             }
         }else{
             $status = 'ERROR';
