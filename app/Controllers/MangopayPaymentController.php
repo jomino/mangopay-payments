@@ -160,7 +160,7 @@ class MangopayPaymentController extends \Core\Controller
                     if(empty($error)){
                         $event = $this->createNewEvent($buyer);
                         $this->logger->info('['.$ip.'] CREATED_BUYER_EVENT -> ID: '.$event->id);
-                        $payin_response = $this->createNewPayin($event,$buyer,$request->getUri());
+                        $payin_response = $this->createNewPayin($event,$request->getUri());
                         if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
                             return $this->view->render($response, 'Home/payredir.html.twig',[
                                 'redir_url' => $payin_response->RedirectURL
@@ -273,7 +273,6 @@ class MangopayPaymentController extends \Core\Controller
 
     private function getCurrentUser($token='')
     {
-        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(!empty($token)){
             $s_token = $token;
         }elseif($this->session->exists(\Util\MangopayUtility::SESSION_REFERRER)){
@@ -283,14 +282,12 @@ class MangopayPaymentController extends \Core\Controller
             $user = \App\Models\User::where('uuid',$s_token)->firstOrFail();
             return $user;
         }catch(\Illuminate\Database\Eloquent\ModelNotFoundException $e){
-            $this->logger->info('['.$ip.'] USER_NOT_FOUND -> ERROR: '.$e->getMessage());
             return null;
         }
     }
 
     private function isValidUser($user=null)
     {
-        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(is_null($user)){ $user = $this->getCurrentUser(); }
         if($this->session->exists(\Util\MangopayUtility::SESSION_DOMAIN)){
             $domain = $this->session->get(\Util\MangopayUtility::SESSION_DOMAIN);
@@ -321,10 +318,14 @@ class MangopayPaymentController extends \Core\Controller
 
     }
 
-    private function createNewPayin($event,$buyer,$uri)
+    private function createNewPayin($event,$uri)
     {
         $payin_options = [];
+        $buyer = $event->buyer;
+        $user = $buyer->user;
+        $client = $user->client;
         $settings = $this->settings['mangopay'];
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         $payment_method = $this->session->get(\Util\MangopayUtility::SESSION_METHOD);
         switch($payment_method){
             case \Util\MangopayUtility::METHOD_SOFORT:
@@ -349,8 +350,9 @@ class MangopayPaymentController extends \Core\Controller
             'CreditedWalletId' => $buyer->wkey,
             'Culture' => $this->language??'EN'
         ]);
-        $akey = $buyer->user->client->akey;
-        $ckey = $buyer->user->client->ckey;
+        $akey = $client->akey;
+        $ckey = $client->ckey;
+        $this->logger->info('['.$ip.'] CREATE_PAYIN -> DATA: ',$payin_options);
         $payin = \Util\MangopayUtility::createPayin($ckey,$akey,$settings['tempdir'],$payin_options);
         return $payin;
     }
