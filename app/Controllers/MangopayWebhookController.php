@@ -15,8 +15,8 @@ class MangopayWebhookController extends \Core\Controller
         $event_type = $params['EventType']??'';
         $ressource_id = $params['RessourceId']??'';
         $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> REQUEST_QUERY ',$params);
-        $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> EVENT_TYPE '.$event_type);
-        $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> RESSOURCE_ID '.$ressource_id);
+        //$this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> EVENT_TYPE '.$event_type);
+        //$this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RECEIVED -> RESSOURCE_ID '.$ressource_id);
         if($client=$this->getClient($c_token)){
             $ressource = $this->getRessource($client,$event_type,$ressource_id);
             if(is_object($ressource) && $ressource->ResultMessage=='Success'){
