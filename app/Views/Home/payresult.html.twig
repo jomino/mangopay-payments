@@ -28,8 +28,8 @@
                 <input type="hidden" name="check-url" value="{{- check_url -}}">
                 <div class="col-sm-6 col-xs-12 border-right">
                     <div class="content-left">
-                        <h2 class="dark-blue boldi">{%- if status=='failed' -%}Oup's ...{%- else -%}Merci{%- endif -%}</h2>
-                        {% if status=='failed' -%}
+                        <h2 class="dark-blue boldi">{%- if status=='PAYOUT_NORMAL_FAILED' -%}Oup's ...{%- else -%}Merci{%- endif -%}</h2>
+                        {% if status=='PAYOUT_NORMAL_FAILED' -%}
                             <h4 class="result mid-red">Une erreur est survenue  <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></h4>
                         {% endif -%}
                         <div class="img-logo">
@@ -37,6 +37,7 @@
                         </div>
                         <div class="result-container">
                             <p class="result-text bold hidden"></p>
+                            <div class="clearfix"></div>
                             <div class="loader-container"></div>
                         </div>
                         <div class="form-group">

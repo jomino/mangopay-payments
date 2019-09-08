@@ -183,15 +183,15 @@ class MangopayPaymentController extends \Core\Controller
         $event = $this->getEvent($args['token']);
         $user = $event->buyer->user;
         $method = $event->method;
-        $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
+        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         $message = '<strong>Produit:</strong> '.$event->product.'<br>';
         $message .= '<strong>Méthode:</strong> '.$method.'<br>';
-        $message .= '<strong>Date:</strong> '.$event_date->format('d/m/Y H:i:s').'<br>';
+        $message .= '<strong>Date:</strong> '.$event->updated_at->format('d/m/Y H:i:s').'<br>';
         $message .= '<strong>Bénéficiaire:</strong> '.$user->name.'<br>';
         $message .= '<strong>Montant:</strong> '.$amount.' &euro;<br>';
         $message .= '<strong>ID transaction:</strong> '.$event->token;
-        $this->logger->info('['.$ip.'] RECEIVE_PAYMENT_RESULT');
+        $this->logger->info('['.$ip.'] RECEIVE_PAYMENT_RESULT -> STATUS '.$event->status);
         return $this->view->render($response, 'Home/payresult.html.twig',[
             'bank_logo' => $method,
             'message' => $message,
