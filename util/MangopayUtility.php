@@ -211,6 +211,11 @@ class MangopayUtility
                             $money->Currency = static::DEFAULT_CURRENCY;
                             $payin->{$key} = $money;
                         break;
+                        case $key=='CardType':
+                            $card_type = new \MangoPay\PayInPaymentDetailsCard();
+                            $card_type->CardType = $options[$key];
+                            $payin->PaymentDetails = $card_type;
+                        break;
                         default:
                             $payin->{$key} = $options[$key];
 
