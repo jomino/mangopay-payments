@@ -12,11 +12,12 @@ class MangopayPaymentController extends \Core\Controller
         $product = $args['product'];
         $token = (string) ltrim($uri->getQuery(),'?');
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
+        $domain = $this->session->get(\Util\MangopayUtility::SESSION_DOMAIN);
         if(empty($token) || strlen($token)<2){ $token = ltrim($args['token'],'?'); }
         $this->setSessionVar(\Util\MangopayUtility::SESSION_REFERRER,$token);
         $this->setSessionVar(\Util\MangopayUtility::SESSION_REMOTE,$ip);
         if($this->isValidUser()){
-            $this->logger->info('['.$ip.'] PAYMENT_START_SUCCEED');
+            $this->logger->info('['.$ip.'] PAYMENT_START_SUCCEED '.$domain);
             $this->setSessionVar(\Util\MangopayUtility::SESSION_AMOUNT,$amount);
             $this->setSessionVar(\Util\MangopayUtility::SESSION_PRODUCT,$product);
             $display_amount = number_format((float) $amount/100, 2, ',', ' ');
