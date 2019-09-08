@@ -221,12 +221,12 @@ class MangopayUtility
                     }
                 break;
                 case $key=='ExecutionType':
-                    if($options['PaymentType']==\MangoPay\PayInExecutionType::Web){
+                    if($options['ExecutionType']==\MangoPay\PayInExecutionType::Web){
                         $exe_type = new \MangoPay\PayInExecutionDetailsWeb();
                         $exe_type->ReturnURL = $options['ReturnURL'];
                         $exe_type->Culture = $options['Culture'];
                         $payin->ExecutionDetails = $exe_type;
-                        $payin->{$key} = $options[$key];
+                        $payin->ExecutionType = $options['ExecutionType'];
                     }
                 break;
                 default:
