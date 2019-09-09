@@ -32,20 +32,20 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalSucceeded:
                             $transfer = $this->initiateTransfer($client,$event);
-                            $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RESSOURCE '.\json_encode($transfer));
+                            $this->logger->info('['.$ip.'] TRANSFER_CREATED '.\json_encode($transfer));
                             if(is_object($transfer) && $transfer->Status==\MangoPay\TransactionStatus::Created){
                                 $message = $event_type.' -> TRANSFER_CREATED -> ID '.$transfer->Id;
                             }else{
                                 $status = 'ERROR';
                                 $message = 'CREATE_TRANSFER_FAILED '.(is_string($transfer)?$transfer:$transfer->ResultMessage);
-                                $this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
+                                //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
                             }
                         break;
                         case \MangoPay\EventType::PayinNormalFailed:
                             if($ressource->Status==\MangoPay\PayInStatus::Failed){
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
-                                $this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$message);
+                                //$this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$message);
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalCreated:
@@ -62,14 +62,14 @@ class MangopayWebhookController extends \Core\Controller
                             }else{
                                 $status = 'ERROR';
                                 $message = 'CREATE_PAYOUT_FAILED '.(is_string($payout)?$payout:$payout->ResultMessage);
-                                $this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
+                                //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalFailed:
                             if($ressource->Status==\MangoPay\TransactionStatus::Failed){
                                 $status = 'ERROR';
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
-                                $this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed);
+                                //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed);
                             }
                         break;
                         case \MangoPay\EventType::PayoutNormalCreated:
@@ -81,15 +81,15 @@ class MangopayWebhookController extends \Core\Controller
                         case \MangoPay\EventType::PayoutNormalSucceeded:
                             if($ressource->Status==\MangoPay\PayOutStatus::Succeeded){
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Succeeded);
-                                $this->sendCellerMail($event);
+                                /* $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Succeeded);
+                                $this->sendCellerMail($event); */
                             }
                         break;
                         case \MangoPay\EventType::PayoutNormalFailed:
                             if($ressource->Status==\MangoPay\PayOutStatus::Failed){
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                                //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
                             }
                         break;
                     }
@@ -108,8 +108,8 @@ class MangopayWebhookController extends \Core\Controller
             $message = 'CLIENT_NOT_FOUND -> TOKEN: '.$c_token;
         }
         $this->logger->info('['.$ip.'] STATUS_'.$status.' -> MESSAGE '.$message);
-        $result = ['status'=>$status,'message'=>$message];
-        return $response->withJson($result)->withStatus(200);
+        //$result = ['status'=>$status,'message'=>$message];
+        return $response->withStatus(200);
     }
 
     private function getClient($token='')
