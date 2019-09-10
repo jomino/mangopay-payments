@@ -25,15 +25,13 @@ class MangopayWebhookController extends \Core\Controller
                 if($event=$this->getEvent($e_token)){
                     switch($event_type){
                         case \MangoPay\EventType::PayinNormalCreated:
-                            if($ressource->Status==\MangoPay\PayInStatus::Created && $event->pikey!=$ressource_id){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $message = $event_type.' -> PAYIN_ID '.$ressource_id;
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $message = $event_type.' -> PAYIN_ID '.$ressource_id;
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::PayinNormalSucceeded:
@@ -41,9 +39,9 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->pikey = $ressource_id;
                                 $event->status = $event_type;
                                 $event->save();
-                                $transfer = $this->initiateTransfer($client,$event);
-                                $this->logger->info('['.$ip.'] TRANSFER_CREATED '.\json_encode($transfer));
-                                if(is_object($transfer) && $transfer->Status==\MangoPay\TransactionStatus::Created){
+                                $transfer = $this->initiateTransfer($event);
+                                if(is_object($transfer)){
+                                    $this->logger->info('['.$ip.'] TRANSFER_CREATED '.\json_encode($transfer));
                                     $message = $event_type.' -> TRANSFER_CREATED_ID '.$transfer->Id;
                                 }else{
                                     $status = 'ERROR';
@@ -56,26 +54,22 @@ class MangopayWebhookController extends \Core\Controller
                             }
                         break;
                         case \MangoPay\EventType::PayinNormalFailed:
-                            if($ressource->Status==\MangoPay\PayInStatus::Failed){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> PAYIN_ID '.$ressource_id;
-                                    //$this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$message);
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $status = 'ERROR';
+                                $message = $event_type.' -> PAYIN_ID '.$ressource_id;
+                                //$this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$message);
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalCreated:
-                            if($ressource->Status==\MangoPay\TransactionStatus::Created){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalSucceeded:
@@ -83,10 +77,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->trkey = $ressource_id;
                                 $event->status = $event_type;
                                 $event->save();
-                                $payout = $this->initiatePayout($client,$event);
-                                $this->logger->info('['.$ip.'] WEBHOOK_REQUEST_RESSOURCE '.\json_encode($payout));
-                                if(is_object($payout) && $payout->Status==\MangoPay\PayOutStatus::Created){
-                                    $message = $event_type.' -> PAYOUT_CREATED -> ID '.$ressource_id;
+                                $payout = $this->initiatePayout($event);
+                                if(is_object($payout)){
+                                    $this->logger->info('['.$ip.'] PAYOUT_CREATED '.\json_encode($payout));
+                                    $message = $event_type.' -> PAYOUT_CREATED_ID '.$ressource_id;
                                 }else{
                                     $status = 'ERROR';
                                     $message = 'CREATE_PAYOUT_FAILED '.(is_string($payout)?$payout:$payout->ResultMessage);
@@ -98,74 +92,67 @@ class MangopayWebhookController extends \Core\Controller
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalFailed:
-                            if($ressource->Status==\MangoPay\TransactionStatus::Failed){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
-                                    //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed);
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $status = 'ERROR';
+                                $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
+                                //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::PayoutNormalCreated:
-                            if($ressource->Status==\MangoPay\PayOutStatus::Created){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::PayoutNormalSucceeded:
-                            if($ressource->Status==\MangoPay\PayOutStatus::Succeeded){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->pokey = $ressource_id;
-                                    $event->save();
-                                    $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                    /* $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Succeeded);
-                                    $this->sendCellerMail($event); */
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->pokey = $ressource_id;
+                                $event->save();
+                                $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
+                                /* $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Succeeded);
+                                $this->sendCellerMail($event); */
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::PayoutNormalFailed:
-                            if($ressource->Status==\MangoPay\PayOutStatus::Failed){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                    //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $status = 'ERROR';
+                                $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
+                                //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::PayoutRefundSucceeded:
-                            if($ressource->Status==\MangoPay\RefundStatus::Succeeded){
-                                if($event->status!=$event_type){
-                                    $event->status = $event_type;
-                                    $event->save();
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                    //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
-                                }else{
-                                    $status = 'ERROR';
-                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
-                                }
+                            if($event->status!=$event_type){
+                                $event->status = $event_type;
+                                $event->save();
+                                $status = 'ERROR';
+                                $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
+                                //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
+                        default:
+                            $status = 'ERROR';
+                            $message = $event_type.' -> NON_REGISTERED_API_CALL '.$ressource_id;
                     }
                 }else{
                     $status = 'ERROR';
@@ -203,10 +190,11 @@ class MangopayWebhookController extends \Core\Controller
         }
     }
 
-    private function initiateTransfer($client,$event)
+    private function initiateTransfer($event)
     {
         $buyer = $event->buyer;
         $user = $buyer->user;
+        $client = $user->client;
         $client_akey = $client->akey;
         $client_ckey = $client->ckey;
         $settings = $this->settings['mangopay'];
@@ -222,22 +210,23 @@ class MangopayWebhookController extends \Core\Controller
         return $transfer;
     }
 
-    private function initiatePayout($client,$event)
+    private function initiatePayout($event)
     {
         $buyer = $event->buyer;
         $user = $buyer->user;
+        $client = $user->client;
         $client_akey = $client->akey;
         $client_ckey = $client->ckey;
         $settings = $this->settings['mangopay'];
         $options_datas = [
             'Tag' => $event->token,
-            'AuthorId' => $buyer->ukey,
+            'AuthorId' => $user->ukey,
             'PaymentType' => \MangoPay\PayOutPaymentType::BankWire,
             'BankWireRef' => \Util\MangopayUtility::DEFAULT_BANK_STATEMENT,
             'BankAccountId' => $user->bkey,
             'DebitedFunds' => $event->amount,
             'Fees' => 0,
-            'DebitedWalletId' => $buyer->wkey
+            'DebitedWalletId' => $user->wkey
         ];
         $payout = \Util\MangopayUtility::createPayout($client_ckey,$client_akey,$settings['tempdir'],$options_datas);
         return $payout;
