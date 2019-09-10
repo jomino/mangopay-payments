@@ -203,22 +203,28 @@ class MangopayPaymentController extends \Core\Controller
 
     public function check($request, $response, $args)
     {
-        $ip = $this->session->get(\Util\StripeUtility::SESSION_REMOTE);
-        $event = $this->getEvent($args['token']);
-        $status = $event->status;
         $title = '';
-        if($status==\MangoPay\EventType::PayoutNormalSucceeded){
-            $title = 'Merci, votre payement nous est bien arrivé.';
+        $event = $this->getEvent($args['token']);
+        $ip = $this->session->get(\Util\StripeUtility::SESSION_REMOTE);
+        if($event){
+            $status = $event->status;
+            if($status==\MangoPay\EventType::PayoutNormalSucceeded){
+                $title = 'Merci, votre payement nous est bien arrivé.';
+            }
+            if($status==\MangoPay\EventType::PayoutNormalCreated ||
+                $status==\MangoPay\EventType::TransferNormalCreated){
+                $title = 'Merci, votre payement est en cour de traitement.';
+            }
+            if($status==\MangoPay\EventType::PayoutNormalFailed ||
+                $status==\MangoPay\EventType::TransferNormalFailed){
+                $title = 'Désolé, votre payement ne nous est pas parvenu.';
+            }
+            $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE: STATUS -> '.$status);
+        }else{
+            $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE -> EVENT_NOT_FOUND');
         }
-        if($status==\MangoPay\EventType::PayoutNormalCreated){
-            $title = 'Merci, votre payement est en cour de traitement.';
-        }
-        if($status==\MangoPay\EventType::PayoutNormalFailed){
-            $title = 'Désolé, votre payement ne nous est pas parvenu.';
-        }
-        $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE: STATUS -> '.$status);
         return $response->withJson([
-            'status' => $title
+            'status' => !empty($title) ? $title:'Merci, le status de votre payement est: '.(isset($status) ? $status:'UNKNOW')
         ]);
     }
 

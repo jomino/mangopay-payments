@@ -142,6 +142,21 @@ class MangopayWebhookController extends \Core\Controller
                             if($ressource->Status==\MangoPay\PayOutStatus::Failed){
                                 if($event->status!=$event_type){
                                     $event->status = $event_type;
+                                    $event->save();
+                                    $status = 'ERROR';
+                                    $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
+                                    //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                                }else{
+                                    $status = 'ERROR';
+                                    $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
+                                }
+                            }
+                        break;
+                        case \MangoPay\EventType::PayoutRefundSucceeded:
+                            if($ressource->Status==\MangoPay\RefundStatus::Succeeded){
+                                if($event->status!=$event_type){
+                                    $event->status = $event_type;
+                                    $event->save();
                                     $status = 'ERROR';
                                     $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
                                     //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
@@ -165,7 +180,6 @@ class MangopayWebhookController extends \Core\Controller
             $message = 'CLIENT_NOT_FOUND -> TOKEN: '.$c_token;
         }
         $this->logger->info('['.$ip.'] STATUS_'.$status.' -> MESSAGE '.$message);
-        //$result = ['status'=>$status,'message'=>$message];
         return $response->withStatus(200);
     }
 
@@ -239,15 +253,17 @@ class MangopayWebhookController extends \Core\Controller
                 case \MangoPay\EventType::PayinNormalCreated==$event_type ||
                     \MangoPay\EventType::PayinNormalSucceeded==$event_type ||
                     \MangoPay\EventType::PayinNormalFailed==$event_type:
-                return \Util\MangopayUtility::getPayin($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
+                        return \Util\MangopayUtility::getPayin($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
                 case \MangoPay\EventType::TransferNormalCreated==$event_type ||
                     \MangoPay\EventType::TransferNormalSucceeded==$event_type ||
                     \MangoPay\EventType::TransferNormalFailed==$event_type:
-                return \Util\MangopayUtility::getTransfer($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
+                        return \Util\MangopayUtility::getTransfer($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
                 case \MangoPay\EventType::PayoutNormalCreated==$event_type ||
                     \MangoPay\EventType::PayoutNormalSucceeded==$event_type ||
                     \MangoPay\EventType::PayoutNormalFailed==$event_type:
-                return \Util\MangopayUtility::getPayout($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
+                        return \Util\MangopayUtility::getPayout($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
+                case \MangoPay\EventType::PayoutRefundSucceeded:
+                        return \Util\MangopayUtility::getRefund($client_ckey,$client_akey,$settings['tempdir'],$ressource_id);
             }
         }
         return null;

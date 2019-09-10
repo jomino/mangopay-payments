@@ -46,6 +46,7 @@ class MangopayUtility
             \MangoPay\EventType::PayoutNormalCreated,
             \MangoPay\EventType::PayoutNormalSucceeded,
             \MangoPay\EventType::PayoutNormalFailed,
+            \MangoPay\EventType::PayoutRefundSucceeded,
             \MangoPay\EventType::TransferNormalCreated,
             \MangoPay\EventType::TransferNormalSucceeded,
             \MangoPay\EventType::TransferNormalFailed
@@ -408,6 +409,26 @@ class MangopayUtility
 
         try {
             $response = $api->PayOuts->Get($pokey);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
+    public static function getRefund($ckey,$akey,$tmp_dir,$id)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->Refunds->Get($id);
             return $response;
         } catch(\MangoPay\Libraries\ResponseException $e) {
             return $e->getMessage();
