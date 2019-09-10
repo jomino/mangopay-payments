@@ -204,8 +204,8 @@ class MangopayPaymentController extends \Core\Controller
     public function check($request, $response, $args)
     {
         $title = '';
-        /* $event = $this->getEvent($args['token']);
-        $ip = $this->session->get(\Util\StripeUtility::SESSION_REMOTE);
+        $event = $this->getEvent($args['token']);
+        /* $ip = $this->session->get(\Util\StripeUtility::SESSION_REMOTE);
         if($event){
             $status = $event->status;
             if($status==\MangoPay\EventType::PayoutNormalSucceeded){
