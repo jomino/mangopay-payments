@@ -203,7 +203,7 @@ class MangopayPaymentController extends \Core\Controller
 
     public function check($request, $response, $args)
     {
-        $title = '';
+        /* $title = '';
         $event = $this->getEvent($args['token']);
         $ip = $this->session->get(\Util\StripeUtility::SESSION_REMOTE);
         if($event){
@@ -225,6 +225,9 @@ class MangopayPaymentController extends \Core\Controller
         }
         return $response->withJson([
             'status' => !empty($title) ? $title : 'Merci, le status de votre payement est: '.(isset($status) ? $status:'UNKNOW')
+        ]); */
+        return $response->withJson([
+            'status' => 'Debug ok'
         ]);
     }
 
