@@ -352,7 +352,6 @@ class MangopayUtility
             'Tag',
             'AuthorId',
             'PaymentType',
-            'BankWireRef',
             'BankAccountId',
             'DebitedFunds',
             'Fees',
@@ -361,33 +360,37 @@ class MangopayUtility
 
         $payout = new \MangoPay\PayOut();
 
-        if(sizeof($options)==sizeof($udatas)){
+        foreach ($udatas as $key) {
+            if(isset($options[$key])){
+                switch(true){
+                    case in_array($key,['DebitedFunds','Fees']):
+                        $money = new \MangoPay\Money();
+                        $money->Amount = $options[$key];
+                        $money->Currency = static::DEFAULT_CURRENCY;
+                        $payout->{$key} = $money;
+                    break;
+                    case $key=='BankAccountId':
+                        if($options['PaymentType']==\MangoPay\PayOutPaymentType::BankWire){
+                            $p_detail = new \MangoPay\PayOutPaymentDetailsBankWire();
+                            $p_detail->BankAccountId = $options['BankAccountId'];
+                            $p_detail->BankWireRef = $options['BankWireRef'];
+                        }
+                        $payout->MeanOfPaymentDetails = $p_detail;
+                    break;
+                    default:
+                        $payout->{$key} = $options[$key];
 
-            foreach ($udatas as $key) {
-                if(isset($options[$key])){
-                    switch(true){
-                        case in_array($key,['DebitedFunds','Fees']):
-                            $money = new \MangoPay\Money();
-                            $money->Amount = $options[$key];
-                            $money->Currency = static::DEFAULT_CURRENCY;
-                            $payout->{$key} = $money;
-                        break;
-                        default:
-                            $payout->{$key} = $options[$key];
-
-                    }
                 }
             }
+        }
 
-            try {
-                $response = $api->PayOuts->Create($payout);
-                return $response;
-            } catch(\MangoPay\Libraries\ResponseException $e) {
-                return $e->getMessage();
-            } catch(\MangoPay\Libraries\Exception $e) {
-                return $e->getMessage();
-            }
-
+        try {
+            $response = $api->PayOuts->Create($payout);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
         }
 
         return 'INVALID_OPTIONS_PAYLOAD';
