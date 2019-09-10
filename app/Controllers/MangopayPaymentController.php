@@ -224,7 +224,7 @@ class MangopayPaymentController extends \Core\Controller
             $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE -> EVENT_NOT_FOUND');
         }
         return $response->withJson([
-            'status' => !empty($title) ? $title:'Merci, le status de votre payement est: '.(isset($status) ? $status:'UNKNOW')
+            'status' => !empty($title) ? $title : 'Merci, le status de votre payement est: '.(isset($status) ? $status:'UNKNOW')
         ]);
     }
 
@@ -235,7 +235,7 @@ class MangopayPaymentController extends \Core\Controller
         $event = $this->getEvent($args['token']);
         $html = $this->getPrintContent($event);
         return $response->withJson([
-            'html' => \base64_encode($html)
+            'html' => \base64_encode(utf8_decode($html))
         ]);
     }
 

@@ -30,8 +30,8 @@ $(document).ready(function(){
     var onPrintLoaded = function(response){
         var html = window.atob(response.html);
         $print_container.html(html);
-        if(printJS){
-            printJS({
+        if(window.printJS){
+            window.printJS({
                 printable: 'print-container',
                 type: 'html',
                 fallbackPrintable: onPrintFinished
