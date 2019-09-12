@@ -206,7 +206,7 @@ class MangopayPaymentController extends \Core\Controller
         $title = '';
         $event = $this->getEvent($args['token']);
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
-        if($event){
+        if(!is_null($event)){
             $status = $event->status;
             if($status==\MangoPay\EventType::PayinNormalSucceeded){
                 $title = 'Merci, votre payement nous est bien arrivé.';
@@ -222,7 +222,7 @@ class MangopayPaymentController extends \Core\Controller
             $this->logger->info('['.$ip.'] CHECK_PAYMENT_ERROR -> EVENT_NOT_FOUND');
         }
         return $response->withJson([
-            'status' => !empty($title) ? $title : 'UNKNOW'
+            'status' => $title!='' ? $title : 'UNKNOW'
         ]);
     }
 
