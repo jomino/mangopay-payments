@@ -102,6 +102,7 @@ class MangopayWebhookController extends \Core\Controller
                         case \MangoPay\EventType::PayoutNormalCreated:
                             if($event->status!=$event_type){
                                 $event->status = $event_type;
+                                $event->pokey = $ressource_id;
                                 $event->save();
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
                             }else{
@@ -112,7 +113,6 @@ class MangopayWebhookController extends \Core\Controller
                         case \MangoPay\EventType::PayoutNormalSucceeded:
                             if($event->status!=$event_type){
                                 $event->status = $event_type;
-                                $event->pokey = $ressource_id;
                                 $event->save();
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
                                 $this->sendCellerMail($event);
@@ -127,7 +127,8 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                $this->sendClientMail($event,$ressource->ResultMessage);
+                                $error = '(ID:'.$event->pokey.') '.$ressource->ResultMessage;
+                                $this->sendClientMail($event,$error);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
