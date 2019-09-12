@@ -6,6 +6,8 @@ $(document).ready(function(){
     var $print_btn = $('.btn-print');
     var $print_container = $('.print-container');
 
+    var max_retry = 3;
+
     var defaultLoaderOptions = {
         background : false,
         minSize: false
@@ -55,7 +57,13 @@ $(document).ready(function(){
             overlayLoader('hide');
             $loading_el.toggleClass('hidden');
         }else{
-            start();
+            if((--max_retry)>=0){
+                start();
+            }else{
+                $hiden_el.toggleClass('hidden visible').text('Un email vous a été envoyé.');
+                overlayLoader('hide');
+                $loading_el.toggleClass('hidden');
+            }
         }
     };
 
