@@ -221,7 +221,7 @@ class MangopayPaymentController extends \Core\Controller
             }
             $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE: STATUS -> '.$status);
         }else{
-            $this->logger->info('['.$ip.'] CHECK_PAYMENT_RESPONSE -> EVENT_NOT_FOUND');
+            $this->logger->info('['.$ip.'] CHECK_PAYMENT_ERROR -> EVENT_NOT_FOUND');
         }
         return $response->withJson([
             'status' => !empty($title) ? $title : 'Merci, le status de votre payement est: '.(isset($status) ? $status:'UNKNOW')

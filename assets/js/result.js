@@ -50,7 +50,7 @@ $(document).ready(function(){
     });
 
     var onChecked = function(response){
-        if(response.status && response.status!=''){
+        if(response.status && response.status!='UNKNOW'){
             $hiden_el.toggleClass('hidden visible').text(response.status);
             overlayLoader('hide');
             $loading_el.toggleClass('hidden');
@@ -72,7 +72,7 @@ $(document).ready(function(){
     };
 
     var start = function(){
-        window.setTimeout(launch,1000);
+        window.setTimeout(launch,5000);
     };
 
     overlayLoader('show',defaultLoaderOptions);
