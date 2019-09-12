@@ -46,8 +46,8 @@ class MangopayWebhookController extends \Core\Controller
                                 }else{
                                     $status = 'ERROR';
                                     $message = 'CREATE_TRANSFER_FAILED '.(is_string($transfer)?$transfer:$transfer->ResultMessage);
-                                    //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
                                 }
+                                $this->sendBuyerMail($event,\MangoPay\PayInStatus::Succeeded);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -59,7 +59,7 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
-                                //$this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$message);
+                                $this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$ressource->ResultMessage);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -80,11 +80,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $payout = $this->initiatePayout($event);
                                 if(is_object($payout)){
                                     $this->logger->info('['.$ip.'] PAYOUT_CREATED '.\json_encode($payout));
-                                    $message = $event_type.' -> PAYOUT_CREATED_ID '.$ressource_id;
+                                    $message = $event_type.' -> PAYOUT_CREATED_ID '.$payout->Id;
                                 }else{
                                     $status = 'ERROR';
                                     $message = 'CREATE_PAYOUT_FAILED '.(is_string($payout)?$payout:$payout->ResultMessage);
-                                    //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed,$message);
                                 }
                             }else{
                                 $status = 'ERROR';
@@ -97,7 +96,6 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
-                                //$this->sendBuyerMail($event,\MangoPay\TransactionStatus::Failed);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -119,8 +117,7 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->pokey = $ressource_id;
                                 $event->save();
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                /* $this->sendBuyerMail($event,\MangoPay\PayOutStatus::Succeeded);
-                                $this->sendCellerMail($event); */
+                                $this->sendCellerMail($event);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -132,7 +129,7 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                                $this->sendClientMail($event,$ressource->ResultMessage);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -144,7 +141,7 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                //$this->sendBuyerMail($event,\MangoPay\PayOutStatus::Failed);
+                                $this->sendClientMail($event,$ressource->ResultMessage);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -266,15 +263,15 @@ class MangopayWebhookController extends \Core\Controller
         $b_name = \ucfirst($buyer->first_name).' '.\ucfirst($buyer->last_name);
 
         $event_tpl = [
-            'SUCCEEDED' => 'Email/email-succeed.html.twig',
-            'CREATED' => 'Email/email-pending.html.twig',
-            'FAILED' => 'Email/email-rejected.html.twig'
+            \MangoPay\PayInStatus::Succeeded => 'Email/email-succeed.html.twig',
+            \MangoPay\PayInStatus::Created => 'Email/email-pending.html.twig',
+            \MangoPay\PayInStatus::Failed => 'Email/email-rejected.html.twig'
         ];
 
         $subject_tpl = [
-            'SUCCEEDED' => $b_name.': Merci pour votre achat',
-            'CREATED' => $b_name.': Votre payement est en cours de traitement',
-            'FAILED' => $b_name.': '.$error
+            \MangoPay\PayInStatus::Succeeded => $user->name.': Merci pour votre achat',
+            \MangoPay\PayInStatus::Created => $user->name.': Votre payement est en cours de traitement',
+            \MangoPay\PayInStatus::Failed => $user->name.': '.$error
         ];
 
         $template = $event_tpl[$status];
@@ -299,7 +296,7 @@ class MangopayWebhookController extends \Core\Controller
         $content = $this->view->fetch($template,$data);
 
         $mailer = new \Util\PhpMailer();
-        return $mailer->send($event->email,$subject,$content);
+        return $mailer->send($buyer->email,$subject,$content);
 
     }
 
@@ -307,6 +304,8 @@ class MangopayWebhookController extends \Core\Controller
     {
         $buyer = $event->buyer;
         $user = $buyer->user;
+
+        $b_name = \ucfirst($buyer->first_name).' '.\ucfirst($buyer->last_name);
 
         $template = 'Email/email-recept.html.twig';
         $subject = 'Un nouveau payement est arrivé';
@@ -316,11 +315,11 @@ class MangopayWebhookController extends \Core\Controller
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         
         $data = [
-            'name' => \ucfirst($user->name),
+            'name' => $user->name,
             'product' => $event->product,
             'method' => $event->method,
-            'client_name' => \ucfirst($buyer->first_name).' '.\ucfirst($buyer->last_name),
-            'client_email' => $buyer->email,
+            'client_name' => $b_name,
+            'client_email' => \Util\Tools::obfuscGetValues($buyer->email),
             'amount' => $amount.' &euro;',
             'token' => $event->token,
             'datetime' => $event_date->format('d/m/Y H:i:s')
@@ -330,5 +329,30 @@ class MangopayWebhookController extends \Core\Controller
 
         $mailer = new \Util\PhpMailer();
         return $mailer->send($user->email,$subject,$content);
+    }
+
+    private function sendClientMail($event,$error='')
+    {
+        $buyer = $event->buyer;
+        $user = $buyer->user;
+        $client = $user->client;
+
+        $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
+
+        $template = 'Email/email-client.html.twig';
+        $subject = 'Incident lors d\'un payement';
+        
+        $data = [
+            'name' => $client->name,
+            'user_name' => $user->name,
+            'event_date' => $event_date->format('d/m/Y H:i:s'),
+            'error' => $error,
+        ];
+        
+        $content = $this->view->fetch($template,$data);
+
+        $mailer = new \Util\PhpMailer();
+        return $mailer->send($client->email,$subject,$content);
+
     }
 }

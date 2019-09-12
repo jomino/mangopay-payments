@@ -1,0 +1,17 @@
+{% extends "Email/email-master.html.twig" %}
+
+{% block content %}
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Bonjour {{ name }},</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Un évenement suscitant votre intervention s'est produit.</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">&nbsp;</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Votre client : <strong>{{ user_name }}</strong><br>Date de l'incident : <strong>{{ event_date }}</strong><br>Raison de l'incident : <strong>{{ error }}</strong></p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">&nbsp;</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Veuillez consulter votre <a href="https://api.mangopay.com/" style="text-decoration: underline; font-size: 14px; text-align: center;">Dashboard MangoPay</a> pour voir les détails.</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">&nbsp;</p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Pour tout complément d'information n'hésitez pas à nous contacter <a href="mailto:info@ipefix.com" style="text-decoration: underline; font-size: 14px; text-align: center;">info@ipefix.com</a></p>
+<p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Cordialement, l'équipe d'Ipefix.</p>
+{% endblock %}
+
+{% block footer %}
+Powered by <a href="http://www.ipefix.com" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">Ipefix Luxembourg</a>.
+{% endblock %}
