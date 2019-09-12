@@ -296,8 +296,8 @@ class MangopayPaymentController extends \Core\Controller
     {
         if(is_null($user)){ $user = $this->getCurrentUser(); }
         if($this->session->exists(\Util\MangopayUtility::SESSION_DOMAIN)){
-            $domain = $this->session->get(\Util\MangopayUtility::SESSION_DOMAIN);
-            return $user->name==$domain && (int) $user->active==1;
+            $domain = \Util\Tools::getTLD($this->session->get(\Util\MangopayUtility::SESSION_DOMAIN));
+            return \Util\Tools::getTLD($user->name)==$domain && (int) $user->active==1;
         }
         return false;
     }
