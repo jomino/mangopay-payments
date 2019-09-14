@@ -54,7 +54,7 @@
                                         <td>
                                             <div class="radio">
                                                 <label class="dark-blue bold">
-                                                    <input type="radio" name="legal-type" value="BUSINESS"{%- if not legal_type or legal_type=='BUSINESS' %} checked{%- endif -%}>
+                                                    <input type="radio" name="legal-type" value="BUSINESS"{%- if not legal_type or legal_type=='BUSINESS' %} checked{%- endif -%}{%- if legal_type %} disabled{%- endif -%}>
                                                     Entreprise
                                                 </label>
                                             </div>
@@ -62,7 +62,7 @@
                                         <td class="text-left">
                                             <div class="radio">
                                                 <label class="dark-blue bold">
-                                                    <input type="radio" name="legal-type" value="SOLETRADER"{%- if legal_type=='SOLETRADER' %} checked{%- endif -%}>
+                                                    <input type="radio" name="legal-type" value="SOLETRADER"{%- if legal_type=='SOLETRADER' %} checked disabled{%- endif -%}>
                                                     Indépendant
                                                 </label>
                                             </div>
@@ -70,7 +70,7 @@
                                         <td class="text-right">
                                             <div class="radio">
                                                 <label class="dark-blue bold">
-                                                    <input type="radio" name="legal-type" value="ORGANIZATION"{%- if legal_type=='ORGANIZATION' %} checked{%- endif -%}>
+                                                    <input type="radio" name="legal-type" value="ORGANIZATION"{%- if legal_type=='ORGANIZATION' %} checked disabled{%- endif -%}>
                                                     Organisation
                                                 </label>
                                             </div>
