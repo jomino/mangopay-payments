@@ -75,6 +75,7 @@ class MangopayPaymentController extends \Core\Controller
                 $data['legal_type'] = $buyer->legal_type;
                 $data['legal_name'] = $buyer->legal_name;
             }
+            $this->logger->info('['.$ip.'] PAYMENT_START_LEGAL -> KNOW_BUYER_ID '.$buyer->id,$data);
         }else{
             $person_type = $request->getParsedBodyParam('person-type');
             $person_nationality = $request->getParsedBodyParam('person-national');
