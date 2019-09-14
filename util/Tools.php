@@ -38,4 +38,13 @@ class Tools
         return $d_parts[sizeof($d_parts)-2].$sep.$d_parts[sizeof($d_parts)-1];
     }
 
+    public static function intGen(int $length)
+    {
+        $long_num = '';
+        for ($i=0; $i < $length ; $i++) { 
+            $long_num .= mt_rand(1,9);
+        }
+        return (int) $long_num;
+    }
+
 }
