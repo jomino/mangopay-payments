@@ -14,6 +14,7 @@ class MangopayUtility
     const DEFAULT_COUNTRY = 'BE';
     
     const DEFAULT_BANK_STATEMENT = 'WEB_PAYMENTS';
+    const DEFAULT_DESCRIPTOR_STATEMENT = 'IPEFIX';
 
     const SESSION_LOGIN = 'client_login';
     const SESSION_REMOTE = 'remote';
@@ -212,12 +213,14 @@ class MangopayUtility
                     if($options['PaymentType']==\MangoPay\PayInPaymentType::Card){
                         $p_details = new \MangoPay\PayInPaymentDetailsCard();
                         $p_details->CardType = $options['CardType'];
+                        $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
                         $payin->PaymentDetails = $p_details;
                         $payin->CardType = $options['CardType'];
                     }
                     if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
                         $p_details = new \MangoPay\PayInPaymentDetailsDirectDebit();
                         $p_details->DirectDebitType = $options['DirectDebitType'];
+                        $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
                         $payin->PaymentDetails = $p_details;
                         $payin->DirectDebitType = $options['DirectDebitType'];
                     }
