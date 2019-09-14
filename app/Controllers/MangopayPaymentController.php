@@ -119,6 +119,7 @@ class MangopayPaymentController extends \Core\Controller
                         switch($person_type){
                             case \MangoPay\PersonType::Legal:
                                 $buyer_options = [
+                                    'Tag' => $user->name,
                                     'PersonType' => $person_type,
                                     'KYCLevel' => $kyc_level,
                                     'LegalPersonType' => $buyer->legal_type,
@@ -133,6 +134,7 @@ class MangopayPaymentController extends \Core\Controller
                             break;
                             case \MangoPay\PersonType::Natural:
                                 $buyer_options = [
+                                    'Tag' => $user->name,
                                     'PersonType' => $person_type,
                                     'KYCLevel' => $kyc_level,
                                     'FirstName' => $buyer->first_name,

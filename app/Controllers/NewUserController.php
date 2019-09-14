@@ -16,11 +16,6 @@ class NewUserController extends \Core\Controller
 
         $datas = $request->getParsedBody();
 
-        $domain = $datas['domain'];
-        $user_id = $datas['user-id'];
-        $wallet_id = $datas['wallet-id'];
-        $bank_id = $datas['bank-id'];
-
         if(false === $request->getAttribute('csrf_status')){
             $this->logger->info('['.$ip.'] NEWUSER_CSRF_REJECTED -> EXIT_WITH_403');
             return $response->write($this->getSecurityAlert())->withStatus(403);
@@ -31,17 +26,8 @@ class NewUserController extends \Core\Controller
 
             if($user=$this->createNewUser($datas)){
                 $uri = $request->getUri();
-                /* $register_link = $uri->getScheme().'://'.$uri->getHost().$this->router->pathFor('register',[
-                    'id' => $user->id,
-                    'token' => '?'.$user->uuid
-                ]);
-                if($this->sendUserMail($register_link,$user)){ */
-                    $this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> '.$user->email);
-                    //$this->logger->info('['.$ip.'] ADDUSER_SUCCESS_EMAIL -> REGISTER_URL:'.$register_link);
-                    $datas['generated_link'] = $uri->getScheme().'://'.$uri->getHost().'/'.$user->uuid.'/';
-                /* }else{
-                    $user->delete();
-                } */
+                $this->logger->info('['.$ip.'] ADDUSER_SUCCESS -> EMAIL '.$user->email);
+                $datas['generated_link'] = $uri->getScheme().'://'.$uri->getHost().'/'.$user->uuid.'/';
             }
 
             if(sizeof($this->errors)>0){
@@ -89,7 +75,7 @@ class NewUserController extends \Core\Controller
                 $this->errors[] = 'Le client est inexistant';
             }
         }else{
-            $this->errors[] = 'Ce client est déjà inscrit';
+            $this->errors[] = 'Cet utilisateur est déjà inscrit';
         }
         return null;
     }
@@ -103,29 +89,6 @@ class NewUserController extends \Core\Controller
             return false;
         }
 
-    }
-
-    private function sendUserMail($link,$user)
-    {
-        $_tpl = 'Email/email-newuser.html.twig';
-        $_subject = 'Inscription au service Stripe-Payments d\'Ipefix';
-        
-        $_content = $this->view->fetch( $_tpl, [
-            'agence' => $user->name,
-            'link' => $link,
-        ]);
-
-        $mailer = new \Util\PhpMailer();
-        $sended = $mailer->send($user->email,$_subject,$_content);
-
-        if(is_string($sended)){
-            $error = 'Impossible d\'envoyer l\'e-mail à l\'adresse '.$user->email." \n";
-            $error .= 'Erreur: '.$sended." \n";
-            $this->errors[] = $error;
-            return false;
-        }
-
-        return true;
     }
 
     private function getErrors()

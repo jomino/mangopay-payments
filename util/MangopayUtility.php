@@ -87,6 +87,7 @@ class MangopayUtility
         $api->Config->TemporaryFolder = $tmp_dir;
         
         $default_datas = [
+            'Tag',
             'PersonType',
             'KYCLevel'
         ];
