@@ -210,20 +210,16 @@ class MangopayUtility
                     $payin->{$key} = $money;
                 break;
                 case $key=='CardType':
-                    if($options['PaymentType']==\MangoPay\PayInPaymentType::Card){
-                        $p_details = new \MangoPay\PayInPaymentDetailsCard();
-                        $p_details->CardType = $options['CardType'];
-                        $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
-                        $payin->PaymentDetails = $p_details;
-                        $payin->CardType = $options['CardType'];
-                    }
-                    if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
-                        $p_details = new \MangoPay\PayInPaymentDetailsDirectDebit();
-                        $p_details->DirectDebitType = $options['DirectDebitType'];
-                        $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
-                        $payin->PaymentDetails = $p_details;
-                        $payin->DirectDebitType = $options['DirectDebitType'];
-                    }
+                    $p_details = new \MangoPay\PayInPaymentDetailsCard();
+                    $p_details->CardType = $options['CardType'];
+                    $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
+                    $payin->PaymentDetails = $p_details;
+                break;
+                case $key=='DirectDebitType':
+                    $p_details = new \MangoPay\PayInPaymentDetailsDirectDebit();
+                    $p_details->DirectDebitType = $options['DirectDebitType'];
+                    $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
+                    $payin->PaymentDetails = $p_details;
                 break;
                 case $key=='ExecutionType':
                     if($options['ExecutionType']==\MangoPay\PayInExecutionType::Web){
