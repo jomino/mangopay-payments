@@ -125,7 +125,7 @@ class MangopayPaymentController extends \Core\Controller
                                     'LegalPersonType' => $buyer->legal_type,
                                     'Name' => $buyer->legal_name,
                                     'Email' => $buyer->email,
-                                    'LegalRepresentativeBirthday' => $buyer->birthday->timestamp,
+                                    'LegalRepresentativeBirthday' => $buyer->birthday->timestamp+1,
                                     'LegalRepresentativeNationality' => $buyer->nationality,
                                     'LegalRepresentativeCountryOfResidence' => $buyer->residence,
                                     'LegalRepresentativeFirstName' => $buyer->first_name,
@@ -139,7 +139,7 @@ class MangopayPaymentController extends \Core\Controller
                                     'KYCLevel' => $kyc_level,
                                     'FirstName' => $buyer->first_name,
                                     'LastName' => $buyer->last_name,
-                                    'Birthday' => $buyer->birthday->timestamp,
+                                    'Birthday' => $buyer->birthday->timestamp+1,
                                     'Nationality' => $buyer->nationality,
                                     'CountryOfResidence' => $buyer->residence,
                                     'Email' => $buyer->email
