@@ -213,6 +213,9 @@ class MangopayUtility
                     $p_details = new \MangoPay\PayInPaymentDetailsCard();
                     $p_details->CardType = $options['CardType'];
                     $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
+                    if(isset($options['CardId'])){
+                        $p_details->CardId = $options['CardId'];
+                    }
                     $payin->PaymentDetails = $p_details;
                 break;
                 case $key=='DirectDebitType':
