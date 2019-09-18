@@ -179,8 +179,6 @@ class MangopayPaymentController extends \Core\Controller
             }else{
                 $this->errors[] = is_string($payin_response) ? $payin_response:$payin_response->ResultMessage??'UNKNOW_ERROR';
             }
-        }else{
-            $this->errors[] = 'EMPTY_CARD_ID';
         }
         $error = implode('<br>',$this->errors);
         return $response->write($this->getSecurityAlert($error))->withStatus(500);
