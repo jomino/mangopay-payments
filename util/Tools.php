@@ -47,7 +47,7 @@ class Tools
         return (int) $long_num;
     }
 
-    public static function getExpiryYear()
+    public static function getExpiryYears()
     {
         $years = [];
         $this_year = (int) \Carbon\Carbon::now()->format('Y');

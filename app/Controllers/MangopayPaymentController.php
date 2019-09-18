@@ -492,7 +492,8 @@ class MangopayPaymentController extends \Core\Controller
                 'key_ref' => $reg_response->AccessKey,
                 'ret_url' => $uri->getScheme().'://'.$uri->getHost().$this->router->pathFor('payment_cardreg',[
                     'token' => $event->token
-                ])
+                ]),
+                'expiry_years' => \Util\Tools::getExpiryYears()
             ]);
         }
         $error = implode('<br>',$this->errors);

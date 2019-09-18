@@ -1,6 +1,7 @@
 
 .m-t-5px {
     margin-top: 5px;
+    font-size: 90%;
 }
 
 @media (min-width: 768px) {
