@@ -151,15 +151,18 @@ class MangopayPaymentController extends \Core\Controller
     public function cardreg($request, $response, $args)
     {
         $uri = $request->getUri();
+        $query = $uri->getQuery();
         $ip = $request->getServerParam('REMOTE_ADDR');
         $event = $this->getEvent($args['token']);
         $buyer = $event->buyer;
-        $params = \Util\Tools::queryGetValues($uri->getQuery());
+        $params = \Util\Tools::queryGetValues($query);
+        $this->logger->info('['.$ip.'] CREATED_CARDGEG_RESPONSE: ',$params);
         $rkey = $this->session->get(\Util\MangopayUtility::SESSION_REGID);
         $rdata = isset($params['data']) ? 'data='.$params['data']:'errorCode='.$params['errorCode'];
-        $response = $this->updateCardReg($event,$rkey,$rdata);
-        if(!is_null($response) && !empty($response->CardId)){
-            $buyer->ckey = $response->CardId;
+        $reg_response = $this->updateCardReg($event,$rkey,$rdata);
+        $this->logger->info('['.$ip.'] UPDATE_CARDGEG_RESPONSE: '.\json_encode($reg_response));
+        if(!is_null($reg_response) && !empty($reg_response->CardId)){
+            $buyer->ckey = $reg_response->CardId;
             $buyer->save();
             $payin_response = $this->createPayin($event,$uri);
             if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
