@@ -55,7 +55,7 @@ class Tools
         for ($i=0; $i < $count_year; $i++) { 
             $years[] = [
                 'name' => $this_year + $i,
-                'value' => $this_year - 2000
+                'value' => ($this_year - 2000) + $i
             ];
         }
         return $years;
