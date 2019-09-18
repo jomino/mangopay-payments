@@ -542,8 +542,9 @@ class MangopayPaymentController extends \Core\Controller
         $buyer = $event->buyer;
         $user = $buyer->user;
         $client = $user->client;
+        $akey = $client->akey;
+        $ckey = $client->ckey;
         $settings = $this->settings['mangopay'];
-        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         $payment_method = $this->session->get(\Util\MangopayUtility::SESSION_METHOD);
         switch($payment_method){
             case \Util\MangopayUtility::METHOD_SOFORT:
@@ -573,10 +574,10 @@ class MangopayPaymentController extends \Core\Controller
             'CreditedWalletId' => $buyer->wkey,
             'Culture' => $this->language ? \strtoupper($this->language):'EN'
         ]);
-        $akey = $client->akey;
-        $ckey = $client->ckey;
-        $this->logger->info('['.$ip.'] CREATE_PAYIN -> DATA: ',$payin_options);
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
+        $this->logger->info('['.$ip.'] CREATE_PAYIN -> SEND: ',$payin_options);
         $payin = \Util\MangopayUtility::createPayin($ckey,$akey,$settings['tempdir'],$payin_options);
+        $this->logger->info('['.$ip.'] CREATE_PAYIN -> RETURN: ',$payin_options);
         return $payin;
     }
 
