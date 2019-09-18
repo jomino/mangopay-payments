@@ -165,7 +165,7 @@ class MangopayPaymentController extends \Core\Controller
             $buyer->ckey = $reg_response->CardId;
             $buyer->save();
             $payin_response = $this->createPayin($event,$uri);
-            if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
+            if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
                 //$this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
                 if(true === (bool) $payin_response->ExecutionDetails->SecureModeNeeded){
                     return $this->view->render($response, 'Home/payredir.html.twig',[
