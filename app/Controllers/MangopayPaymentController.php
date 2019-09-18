@@ -69,8 +69,8 @@ class MangopayPaymentController extends \Core\Controller
             $person_type = $buyer->person_type;
             $person_nationality = $buyer->nationality;
             $person_residence = $buyer->residence;
-            $data['first_name'] = $buyer->first_name;
-            $data['last_name'] = $buyer->last_name;
+            $data['first_name'] = \ucfirst($buyer->first_name);
+            $data['last_name'] = \ucfirst($buyer->last_name);
             $data['birthday'] = $buyer->birthday->format('d/m/Y');
             if($buyer->person_type==\MangoPay\PersonType::Legal){
                 $data['legal_type'] = $buyer->legal_type;
