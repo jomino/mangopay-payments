@@ -47,4 +47,17 @@ class Tools
         return (int) $long_num;
     }
 
+    public static function getExpiryYear()
+    {
+        $years = [];
+        $this_year = (int) \Carbon\Carbon::now()->format('Y');
+        $count_year = 10;
+        for ($i=0; $i < $count_year; $i++) { 
+            $years[] = [
+                'name' => $this_year + $i,
+                'value' => $this_year - 2000
+            ];
+        }
+    }
+
 }
