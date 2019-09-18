@@ -29,10 +29,10 @@
 
 @media (min-width: 768px) {
     .main .border-right {
-        min-height: 225px !important;
+        min-height: 255px !important;
     }
     .main .border-left {
-        min-height: 225px !important;
+        min-height: 255px !important;
     }
     .main .content-right .form-group {
         max-width: 100%;
