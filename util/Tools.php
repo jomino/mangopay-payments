@@ -50,7 +50,7 @@ class Tools
     public static function getExpiryYears()
     {
         $years = [];
-        $this_year = (int) \Carbon\Carbon::now()->format('Y');
+        $this_year = (\Carbon\Carbon::now())->year;
         $count_year = 10;
         for ($i=0; $i < $count_year; $i++) { 
             $years[] = [
@@ -58,6 +58,7 @@ class Tools
                 'value' => $this_year - 2000
             ];
         }
+        return $years;
     }
 
 }
