@@ -121,8 +121,7 @@ class MangopayPaymentController extends \Core\Controller
                                     }
                                 default:
                                     $payin_response = $this->createPayin($event,$uri);
-                                    if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
-                                        //$this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
+                                    if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
                                         return $this->view->render($response, 'Home/payredir.html.twig',[
                                             'redir_url' => \stripslashes($payin_response->ExecutionDetails->RedirectURL)
                                         ]);
@@ -166,7 +165,6 @@ class MangopayPaymentController extends \Core\Controller
             $buyer->save();
             $payin_response = $this->createPayin($event,$uri);
             if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
-                //$this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
                 if(true === (bool) $payin_response->ExecutionDetails->SecureModeNeeded){
                     return $this->view->render($response, 'Home/payredir.html.twig',[
                         'redir_url' => \stripslashes($payin_response->ExecutionDetails->SecureModeRedirectURL)
@@ -197,8 +195,7 @@ class MangopayPaymentController extends \Core\Controller
             $buyer->ckey = $cid;
             $buyer->save();
             $payin_response = $this->createPayin($event,$uri);
-            if(is_object($payin_response) && $payin_response->Status==\MangoPay\PayInStatus::Created){
-                //$this->logger->info('['.$ip.'] CREATED_PAYIN_RESPONSE: '.\json_encode($payin_response));
+            if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
                 if(true === (bool) $payin_response->ExecutionDetails->SecureModeNeeded){
                     return $this->view->render($response, 'Home/payredir.html.twig',[
                         'redir_url' => \stripslashes($payin_response->ExecutionDetails->SecureModeRedirectURL)
