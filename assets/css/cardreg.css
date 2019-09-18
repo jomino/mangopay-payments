@@ -1,4 +1,8 @@
 
+.m-t-5px {
+    margin-top: 5px;
+}
+
 @media (min-width: 768px) {
     .main .border-right {
         min-height: 235px !important;
@@ -24,10 +28,14 @@
         table-layout: fixed;
     }
     .main .content-right .form-group table td:first-child {
-        padding-right: 12px;
+        padding-right: 6px;
+    }
+    .main .content-right .form-group table td:nth-child(2) {
+        padding-right: 6px;
+        padding-left: 6px;
     }
     .main .content-right .form-group table td:last-child {
-        padding-left: 12px;
+        padding-left: 6px;
     }
 }
 @media (min-width: 377px) and  (max-width: 767px) {
@@ -50,10 +58,14 @@
         width: 100%;
     }
     .main .content-right .form-group table td:first-child {
-        padding-right: 12px;
+        padding-right: 6px;
+    }
+    .main .content-right .form-group table td:nth-child(2) {
+        padding-right: 6px;
+        padding-left: 6px;
     }
     .main .content-right .form-group table td:last-child {
-        padding-left: 12px;
+        padding-left: 6px;
     }
 }
 @media (max-width: 376px) {
@@ -76,9 +88,13 @@
         width: 100%;
     }
     .main .content-right .form-group table td:first-child {
-        padding-right: 12px;
+        padding-right: 6px;
+    }
+    .main .content-right .form-group table td:nth-child(2) {
+        padding-right: 6px;
+        padding-left: 6px;
     }
     .main .content-right .form-group table td:last-child {
-        padding-left: 12px;
+        padding-left: 6px;
     }
 }
