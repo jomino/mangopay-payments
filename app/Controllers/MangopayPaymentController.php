@@ -496,6 +496,7 @@ class MangopayPaymentController extends \Core\Controller
         }
         $error = implode('<br>',$this->errors);
         $this->logger->info('['.$ip.'] CARDREG_PROCESS_ERROR : '.$error);
+        $this->logger->info('['.$ip.'] CREATED_CARDREG_RESPONSE: '.\json_encode($reg_response));
         return $this->getSecurityAlert($error);
     }
 
@@ -506,7 +507,7 @@ class MangopayPaymentController extends \Core\Controller
         $client = $user->client;
         $akey = $client->akey;
         $ckey = $client->ckey;
-        $ukey = $user->ukey;
+        $ukey = $buyer->ukey;
         $settings = $this->settings['mangopay'];
         $response = \Util\MangopayUtility::createCardReg($ckey,$akey,$ukey,$settings['tempdir']);
         if(is_object($response) && $response->Status==\MangoPay\CardRegistrationStatus::Created){
