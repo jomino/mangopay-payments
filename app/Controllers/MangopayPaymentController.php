@@ -456,7 +456,7 @@ class MangopayPaymentController extends \Core\Controller
         $client = $buyer->user->client;
         $akey = $client->akey;
         $ckey = $client->ckey;
-        $ukey = $buyer->ckey;
+        $ukey = $buyer->ukey;
         $settings = $this->settings['mangopay'];
         $response = \Util\MangopayUtility::getCards($ckey,$akey,$settings['tempdir'],$ukey);
         if(is_array($response) || is_object($response)){
