@@ -1,0 +1,42 @@
+
+.main .content button>span {
+    font-family: PaymentFont;
+}
+
+@media (min-width: 768px) {
+    .main .border-right {
+        min-height: 235px !important;
+    }
+    .main .border-left {
+        min-height: 235px !important;
+    }
+    .main .content-right .detail {
+        margin-top: 10px;
+        min-width: 100%;
+    }
+    .main .content-right .form-container {
+        width: 275px;
+        margin-top: 15px;
+    }
+    .main .content-right .form-group {
+        margin-bottom: 10px;
+    }
+}
+@media (min-width: 377px) and  (max-width: 767px) {
+    .main .content-right .form-container {
+        margin-top: 15px;
+    }
+    .main .content-right .form-group {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+}
+@media (max-width: 376px) {
+    .main .content-right .form-container {
+        margin-top: 15px;
+    }
+    .main .content-right .form-group {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+}

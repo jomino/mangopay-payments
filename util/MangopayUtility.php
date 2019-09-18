@@ -8,7 +8,7 @@ class MangopayUtility
     const METHOD_BANCONTACT = 'BCMC';
     const METHOD_SOFORT = 'SOFORT';
     const METHOD_IDEAL = 'IDEAL';
-    // const METHOD_IBAN = 'iban';
+    const METHOD_CVM = 'CB_VISA_MASTERCARD';
 
     const DEFAULT_CURRENCY = 'EUR';
     const DEFAULT_COUNTRY = 'BE';
@@ -25,6 +25,7 @@ class MangopayUtility
     const SESSION_PRODUCT = 'product_ref';
     const SESSION_METHOD = 'payment_type';
     const SESSION_TOKEN = 'event_token';
+    const SESSION_REGID = 'card_regid';
 
     const SESSION_PERSON_TYPE = 'person_type';
     const SESSION_PERSON_EMAIL = 'person_email';
@@ -174,6 +175,100 @@ class MangopayUtility
 
     }
 
+    public static function createCardReg($ckey,$akey,$ukey,$tmp_dir)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        $udatas = [
+            'UserId' => $ukey,
+            'Currency' => static::DEFAULT_CURRENCY,
+            'CardType' => static::METHOD_CVM
+        ];
+
+        $creg = new \MangoPay\CardRegistration();
+
+        foreach ($udatas as $key) {
+            $creg->{$key} = $udatas[$key];
+        }
+
+        try {
+            $response = $api->CardRegistrations->Create($creg);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
+    public static function updateCardReg($ckey,$akey,$tmp_dir,$rkey,$rdata)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $creg = $api->CardRegistrations->Get($rkey);
+            $creg->RegistrationData = $rdata;
+            $response = $api->CardRegistrations->Update($creg);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
+    public static function getCard($ckey,$akey,$tmp_dir,$card_id)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->Cards->Get($card_id);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
+    public static function getCards($ckey,$akey,$tmp_dir,$ukey)
+    {
+        $api = new \MangoPay\MangoPayApi();
+        
+        // configuration
+        $api->Config->ClientId = $ckey;
+        $api->Config->ClientPassword = $akey;
+        $api->Config->TemporaryFolder = $tmp_dir;
+
+        try {
+            $response = $api->Users->GetCards($ukey);
+            return $response;
+        } catch(\MangoPay\Libraries\ResponseException $e) {
+            return $e->getMessage();
+        } catch(\MangoPay\Libraries\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
     public static function createPayin($ckey,$akey,$tmp_dir,$options=[])
     {
         $api = new \MangoPay\MangoPayApi();
@@ -194,9 +289,9 @@ class MangopayUtility
         ];
 
         if($options['PaymentType']==\MangoPay\PayInPaymentType::DirectDebit){
-            $udatas[] = 'DirectDebitType';
+            $udatas[] = 'DirectDebit';
         }else{
-            $udatas[] = 'CardType';
+            $udatas[] = 'Card';
         }
 
         $payin = new \MangoPay\PayIn();
@@ -209,18 +304,22 @@ class MangopayUtility
                     $money->Currency = static::DEFAULT_CURRENCY;
                     $payin->{$key} = $money;
                 break;
-                case $key=='CardType':
+                case $key=='Card':
                     $p_details = new \MangoPay\PayInPaymentDetailsCard();
-                    $p_details->CardType = $options['CardType'];
-                    $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
+                    if(isset($options['CardType'])){
+                        $p_details->CardType = $options['CardType'];
+                    }
                     if(isset($options['CardId'])){
                         $p_details->CardId = $options['CardId'];
                     }
+                    $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
                     $payin->PaymentDetails = $p_details;
                 break;
-                case $key=='DirectDebitType':
+                case $key=='DirectDebit':
                     $p_details = new \MangoPay\PayInPaymentDetailsDirectDebit();
-                    $p_details->DirectDebitType = $options['DirectDebitType'];
+                    if(isset($options['DirectDebitType'])){
+                        $p_details->DirectDebitType = $options['DirectDebitType'];
+                    }
                     $p_details->StatementDescriptor = static::DEFAULT_DESCRIPTOR_STATEMENT;
                     $payin->PaymentDetails = $p_details;
                 break;
@@ -229,9 +328,14 @@ class MangopayUtility
                         $exe_type = new \MangoPay\PayInExecutionDetailsWeb();
                         $exe_type->ReturnURL = $options['ReturnURL'];
                         $exe_type->Culture = $options['Culture'];
-                        $payin->ExecutionDetails = $exe_type;
-                        $payin->ExecutionType = $options['ExecutionType'];
                     }
+                    if($options['ExecutionType']==\MangoPay\PayInExecutionType::Direct){
+                        $exe_type = new \MangoPay\PayInExecutionDetailsDirect();
+                        $exe_type->SecureModeReturnURL = $options['ReturnURL'];
+                        $exe_type->Culture = $options['Culture'];
+                    }
+                    $payin->ExecutionDetails = $exe_type;
+                    $payin->ExecutionType = $options['ExecutionType'];
                 break;
                 default:
                     $payin->{$key} = $options[$key];

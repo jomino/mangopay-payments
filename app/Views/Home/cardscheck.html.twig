@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/">
+<title>Ipefix Payment Solution</title>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="css/paymentfont.min.css">
+<link rel="stylesheet" href="css/application.css">
+<link rel="stylesheet" href="css/cardscheck.css">
+<script src="js/jquery-1.12.4.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container main hidden">
+        <div class="row header">
+            <div class="col-sm-6 col-xs-12 col-sm-offset-3">
+                <div class="text-center">
+                    <h1 class="boldi light-blue">Ipefix Payment Solution</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row content">
+            <div class="col-sm-6 col-xs-12 border-right">
+                <div class="content-left">
+                    <h2 class="dark-blue boldi">Coordonnées bancaires</h2>
+                    <h4 class="mid-blue">&Eacute;tape 2</h4>
+                    <h3 class="dark-blue boldi">{{ (session.amount/100)|number_format(2, ',', ' ') }} &euro;</h3>
+                    <p class="product bold">
+                        <span>{{ session.product_ref }}</span><br>&nbsp;<br>
+                        <span>*Aucune donnée bancaire ne transite par nos serveurs</span>
+                    </p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xs-12 border-left">
+                <div class="content-right">
+                    <p class="detail">
+                        Au moins un moyen de payement est dèjà enregistré pour vous.
+                        Choisissez de ré-utiliser une carte existante ou enregistrez en une nouvelle.
+                    </p>
+                    <div class="form-container">
+                        {% for card in cards_list %}
+                            {# if none of #}
+                            {% if card.bank %}{% set card_icon = 'pf-card' %}{% endif %}
+                            {# if one of #}
+                            {% if card.bank == 'CB' %}{% set card_icon = 'pf-cb' %}{% endif %}
+                            {% if card.bank == 'VISA' %}{% set card_icon = 'pf-visa' %}{% endif %}
+                            {% if card.bank == 'MASTERCARD' %}{% set card_icon = 'pf-american-express-alt' %}{% endif %}
+                            {# if none at all #}
+                            {% if not card.bank or card.bank == '' %}{% set card_icon = 'pf-card' %}{% endif %}
+                            <form action="{{- path_for('payment_accepted') -}}" method="post">
+                                <input type="hidden" name="{{csrf.keys.name}}" value="{{csrf.name}}">
+                                <input type="hidden" name="{{csrf.keys.value}}" value="{{csrf.value}}">
+                                <input type="hidden" name="cid" value="{{- card.cid -}}">
+                                <input type="hidden" name="token" value="{{- token -}}">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-default btn-sm btn-block bold"><span class="{{- card_icon -}}"></span> {{ card.num }} ({{- card.exp -}})</button>
+                                </div>
+                            </form>
+                        {% endfor %}
+                        <form action="{{ path_for('payment_addcard') }}" method="post">
+                            <input type="hidden" name="{{csrf.keys.name}}" value="{{csrf.name}}">
+                            <input type="hidden" name="{{csrf.keys.value}}" value="{{csrf.value}}">
+                                <input type="hidden" name="token" value="{{- token -}}">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-default btn-sm btn-block bold">Nouveau moyen de payement</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row footer">
+            <div class="col-sm-4 col-sm-offset-4">
+                <div class="text-center copyr">&copy; Ipefix 2019</div>
+            </div>
+        </div>
+    </div>
+    <div class="container loader"></div>
+    <script src="js/loadingoverlay.min.js"></script>
+    <script src="js/application.js"></script>
+    <script src="js/payidentify.js"></script>
+</body>
+</html>
