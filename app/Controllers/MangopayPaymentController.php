@@ -577,7 +577,7 @@ class MangopayPaymentController extends \Core\Controller
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         $this->logger->info('['.$ip.'] CREATE_PAYIN -> SEND: ',$payin_options);
         $payin = \Util\MangopayUtility::createPayin($ckey,$akey,$settings['tempdir'],$payin_options);
-        $this->logger->info('['.$ip.'] CREATE_PAYIN -> RETURN: ',$payin_options);
+        $this->logger->info('['.$ip.'] CREATED_PAYIN -> RETURN: ',$payin_options);
         return $payin;
     }
 
