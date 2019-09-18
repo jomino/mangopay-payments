@@ -496,7 +496,6 @@ class MangopayPaymentController extends \Core\Controller
         }
         $error = implode('<br>',$this->errors);
         $this->logger->info('['.$ip.'] CARDREG_PROCESS_ERROR : '.$error);
-        $this->logger->info('['.$ip.'] CREATED_CARDREG_RESPONSE: '.\json_encode($reg_response));
         return $this->getSecurityAlert($error);
     }
 

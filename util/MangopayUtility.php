@@ -186,14 +186,13 @@ class MangopayUtility
 
         $udatas = [
             'UserId' => $ukey,
-            'Currency' => static::DEFAULT_CURRENCY,
-            'CardType' => static::METHOD_CVM
+            'Currency' => static::DEFAULT_CURRENCY
         ];
 
         $creg = new \MangoPay\CardRegistration();
 
-        foreach ($udatas as $key) {
-            $creg->{$key} = $udatas[$key];
+        foreach ($udatas as $key=>$value) {
+            $creg->{$key} = $value;
         }
 
         try {
