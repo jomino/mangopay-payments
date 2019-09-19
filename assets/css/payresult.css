@@ -72,12 +72,18 @@
     body{
         width: 21cm;
         height: 29.7cm;
-        margin: 30mm 45mm 30mm 45mm;
+        font: 13pt Georgia, "Times New Roman", Times, serif;
+        line-height: 1.3;
+        background: #fff !important;
+        color: #000;
     }
     .main{
         visibility: hidden;
     }
     #print-container {
         visibility: visible;
+    }
+    @page {
+        margin: 2cm;
     }
 }
