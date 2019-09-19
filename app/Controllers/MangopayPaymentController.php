@@ -283,9 +283,9 @@ class MangopayPaymentController extends \Core\Controller
     public function print($request, $response, $args)
     {
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
-        $this->logger->info('['.$ip.'] PRINT_PAYMENT_RESULT');
+        $this->logger->info('['.$ip.'] PRINT_PAYMENT_RESULT -> TOKEN: '.$args['token']);
         $event = $this->getEvent($args['token']);
-        $html = $this->getPrintContent($event);
+        $html = 'Helloworld';//$this->getPrintContent($event);
         return $response->withJson([
             'html' => \base64_encode(utf8_decode($html))
         ]);
@@ -294,7 +294,9 @@ class MangopayPaymentController extends \Core\Controller
     private function getPrintContent($event)
     {
         $status = $event->status;
-        $user = $event->buyer->user;
+        $buyer = $event->buyer;
+        $user = $buyer->user;
+
         $event_tpl = [
             \MangoPay\EventType::PayoutNormalSucceeded => 'Email/email-succeed.html.twig',
             \MangoPay\EventType::PayoutNormalCreated => 'Email/email-pending.html.twig',
@@ -305,12 +307,12 @@ class MangopayPaymentController extends \Core\Controller
 
         $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
 
-        $amount = number_format((float) $event->amount/100, 2, ',', ' ');
+        $amount = \number_format((float) $event->amount/100, 2, ',', ' ');
         
         $data = [
             'name' => $event->name,
             'product' => $event->product,
-            'method' => ucfirst($event->method),
+            'method' => $event->method,
             'client_name' => $user->name,
             'client_email' => $user->email,
             'amount' => $amount.' &euro;',
