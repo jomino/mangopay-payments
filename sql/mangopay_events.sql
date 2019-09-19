@@ -10,5 +10,6 @@ CREATE TABLE `mangopay_events` (
   `pikey` varchar(128) NOT NULL default '',
   `trkey` varchar(128) NOT NULL default '',
   `pokey` varchar(128) NOT NULL default '',
+  `payin` varchar(128) NOT NULL default '',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

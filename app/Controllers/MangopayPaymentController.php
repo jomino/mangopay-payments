@@ -259,7 +259,7 @@ class MangopayPaymentController extends \Core\Controller
         $event = $this->getEvent($args['token']);
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(!is_null($event)){
-            $status = $event->buyer->status;
+            $status = $event->payin;
             if($status==\MangoPay\EventType::PayinNormalSucceeded){
                 $title = 'Merci, votre payement nous est bien arrivé.';
             }

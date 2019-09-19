@@ -24,6 +24,7 @@ class MangopayWebhookController extends \Core\Controller
                     switch($event_type){
                         case \MangoPay\EventType::PayinNormalCreated:
                             if($event->status!=$event_type){
+                                $event->pikey = $ressource_id;
                                 $event->status = $event_type;
                                 $event->save();
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
@@ -34,11 +35,7 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalSucceeded:
                             if($event->status!=$event_type){
-                                $event->pikey = $ressource_id;
-                                $event->status = $event_type;
-                                $buyer = $event->buyer;
-                                $buyer->status = $event_type;
-                                $buyer->save();
+                                $event->status = $event->payin = $event_type;
                                 $event->save();
                                 $transfer = $this->initiateTransfer($event);
                                 if(is_object($transfer)){
@@ -56,10 +53,7 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalFailed:
                             if($event->status!=$event_type){
-                                $event->status = $event_type;
-                                $buyer = $event->buyer;
-                                $buyer->status = $event_type;
-                                $buyer->save();
+                                $event->status = $event->payin = $event_type;
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
@@ -71,6 +65,7 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::TransferNormalCreated:
                             if($event->status!=$event_type){
+                                $event->trkey = $ressource_id;
                                 $event->status = $event_type;
                                 $event->save();
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
@@ -78,7 +73,6 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::TransferNormalSucceeded:
                             if($event->status!=$event_type){
-                                $event->trkey = $ressource_id;
                                 $event->status = $event_type;
                                 $event->save();
                                 $payout = $this->initiatePayout($event);
@@ -100,6 +94,8 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
+                                $error = '(ID:'.$event->trkey.') '.$ressource->ResultMessage;
+                                $this->sendClientMail($event,$error);
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -107,8 +103,8 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayoutNormalCreated:
                             if($event->status!=$event_type){
-                                $event->status = $event_type;
                                 $event->pokey = $ressource_id;
+                                $event->status = $event_type;
                                 $event->save();
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
                             }else{

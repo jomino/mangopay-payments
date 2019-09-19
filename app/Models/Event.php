@@ -5,7 +5,7 @@ namespace App\Models;
 class Event extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'mangopay_events';
-    protected $fillable = ['status','token','amount','product','method','pikey','trkey','pokey'];
+    protected $fillable = ['status','token','amount','product','method','pikey','trkey','pokey','payin'];
     protected $casts = [
         'status' => 'string',
         'token' => 'string',
@@ -14,7 +14,8 @@ class Event extends \Illuminate\Database\Eloquent\Model
         'method' => 'string',
         'pikey' => 'string',    // payins-id
         'trkey' => 'string',    // transfers-id
-        'pokey' => 'string'     // payout-id
+        'pokey' => 'string',     // payout-id
+        'payin' => 'string'
     ];
 
     public function buyer()
