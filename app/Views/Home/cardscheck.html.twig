@@ -44,13 +44,11 @@
                     <div class="form-container">
                         {% for card in cards_list %}
                             {# if none of #}
-                            {% if card.bank %}{% set card_icon = 'pf-card' %}{% endif %}
+                            {% set card_icon = 'pf-credit-card' %}
                             {# if one of #}
                             {% if card.bank == 'CB' %}{% set card_icon = 'pf-cb' %}{% endif %}
                             {% if card.bank == 'VISA' %}{% set card_icon = 'pf-visa' %}{% endif %}
                             {% if card.bank == 'MASTERCARD' %}{% set card_icon = 'pf-american-express-alt' %}{% endif %}
-                            {# if none at all #}
-                            {% if not card.bank or card.bank == '' %}{% set card_icon = 'pf-card' %}{% endif %}
                             <form action="{{- path_for('payment_accepted') -}}" method="post">
                                 <input type="hidden" name="{{csrf.keys.name}}" value="{{csrf.name}}">
                                 <input type="hidden" name="{{csrf.keys.value}}" value="{{csrf.value}}">
