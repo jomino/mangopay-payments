@@ -300,7 +300,7 @@ class MangopayWebhookController extends \Core\Controller
         $template = $event_tpl[$status];
         $subject = $subject_tpl[$status];
 
-        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
+        $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
 
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         
@@ -312,7 +312,7 @@ class MangopayWebhookController extends \Core\Controller
             'client_email' => $user->email,
             'amount' => $amount.' &euro;',
             'token' => $event->token,
-            'datetime' => $event->updated_at->format('d/m/Y H:i:s'),
+            'datetime' => $event_date->format('d/m/Y H:i:s'),
             'error' => $error
         ];
         
