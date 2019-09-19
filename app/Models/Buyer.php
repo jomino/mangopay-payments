@@ -5,7 +5,7 @@ namespace App\Models;
 class Buyer extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'mangopay_buyers';
-    protected $fillable = ['person_type','legal_type','last_name','first_name','legal_name','birthday','nationality','residence','email','ukey','wkey','status'];
+    protected $fillable = ['person_type','legal_type','last_name','first_name','legal_name','birthday','nationality','residence','email','ukey','wkey'];
     protected $casts = [
         'person_type' => 'string',
         'legal_type' => 'string',
@@ -17,8 +17,7 @@ class Buyer extends \Illuminate\Database\Eloquent\Model
         'residence' => 'string',
         'email' => 'string',
         'ukey' => 'string', // user-id
-        'wkey' => 'string', // wallet-id
-        'status' => 'string'  // bank-id
+        'wkey' => 'string' // wallet-id
     ];
 
     public function events()

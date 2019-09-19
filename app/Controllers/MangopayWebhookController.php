@@ -45,7 +45,10 @@ class MangopayWebhookController extends \Core\Controller
                                     $status = 'ERROR';
                                     $message = 'CREATE_TRANSFER_FAILED '.(is_string($transfer)?$transfer:$transfer->ResultMessage);
                                 }
-                                $this->sendBuyerMail($event,\MangoPay\PayInStatus::Succeeded);
+                                $send = $this->sendBuyerMail($event,\MangoPay\PayInStatus::Succeeded);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -57,7 +60,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
-                                $this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$ressource->ResultMessage);
+                                $send = $this->sendBuyerMail($event,\MangoPay\PayInStatus::Failed,$ressource->ResultMessage);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -69,6 +75,9 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->status = $event_type;
                                 $event->save();
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
+                            }else{
+                                $status = 'ERROR';
+                                $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
                             }
                         break;
                         case \MangoPay\EventType::TransferNormalSucceeded:
@@ -95,7 +104,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $status = 'ERROR';
                                 $message = $event_type.' -> TRANSFER_ID '.$ressource_id;
                                 $error = '(ID:'.$event->trkey.') '.$ressource->ResultMessage;
-                                $this->sendClientMail($event,$error);
+                                $send = $this->sendClientMail($event,$error);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->user->client->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -117,7 +129,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->status = $event_type;
                                 $event->save();
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                $this->sendCellerMail($event);
+                                $send = $this->sendCellerMail($event);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->user->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -130,7 +145,10 @@ class MangopayWebhookController extends \Core\Controller
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
                                 $error = '(ID:'.$event->pokey.') '.$ressource->ResultMessage;
-                                $this->sendClientMail($event,$error);
+                                $send = $this->sendClientMail($event,$error);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->user->client->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -142,7 +160,11 @@ class MangopayWebhookController extends \Core\Controller
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYOUT_ID '.$ressource_id;
-                                $this->sendClientMail($event,$ressource->ResultMessage);
+                                $error = '(ID:'.$event->pokey.') '.$ressource->ResultMessage;
+                                $send = $this->sendClientMail($event,$error);
+                                if($send !== true){
+                                    $this->logger->info('['.$ip.'] CANNOT_SEND_MAIL_TO: '.$event->buyer->user->client->email);
+                                }
                             }else{
                                 $status = 'ERROR';
                                 $message = $event_type.' -> REDONDANT_API_CALL '.$ressource_id;
@@ -265,20 +287,18 @@ class MangopayWebhookController extends \Core\Controller
 
         $event_tpl = [
             \MangoPay\PayInStatus::Succeeded => 'Email/email-succeed.html.twig',
-            \MangoPay\PayInStatus::Created => 'Email/email-pending.html.twig',
             \MangoPay\PayInStatus::Failed => 'Email/email-rejected.html.twig'
         ];
 
         $subject_tpl = [
             \MangoPay\PayInStatus::Succeeded => $user->name.': Merci pour votre achat',
-            \MangoPay\PayInStatus::Created => $user->name.': Votre payement est en cours de traitement',
             \MangoPay\PayInStatus::Failed => $user->name.': '.$error
         ];
 
         $template = $event_tpl[$status];
         $subject = $subject_tpl[$status];
 
-        $event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
+        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
 
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         
@@ -290,7 +310,7 @@ class MangopayWebhookController extends \Core\Controller
             'client_email' => $user->email,
             'amount' => $amount.' &euro;',
             'token' => $event->token,
-            'datetime' => $event_date->format('d/m/Y H:i:s'),
+            'datetime' => $event->updated_at->format('d/m/Y H:i:s'),
             'error' => $error
         ];
         
