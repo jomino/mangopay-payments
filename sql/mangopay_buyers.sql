@@ -8,7 +8,7 @@ CREATE TABLE `mangopay_buyers` (
   `ukey` varchar(128) NOT NULL default '',
   `wkey` varchar(128) NOT NULL default '',
   `bkey` varchar(128) NOT NULL default '',
-  `ckey` varchar(128) NOT NULL default '',
+  `status` varchar(128) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

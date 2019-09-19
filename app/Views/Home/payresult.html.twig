@@ -28,7 +28,10 @@
                 <input type="hidden" name="check-url" value="{{- check_url -}}">
                 <div class="col-sm-6 col-xs-12 border-right">
                     <div class="content-left">
-                        <h2 class="dark-blue boldi">Merci pour votre achat</h2>
+                        <h2 class="dark-blue boldi">{%- if status=='PAYIN_NORMAL_FAILED' -%}Oup's ...{%- else -%}Merci{%- endif -%}</h2>
+                        {% if status=='PAYIN_NORMAL_FAILED' -%}
+                            <h4 class="result mid-red">Une erreur est survenue  <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span></h4>
+                        {% endif -%}
                         <div class="img-logo">
                             <img src="images/{{ bank_logo }}.png" alt="bank-logo" class="img-logo">
                         </div>

@@ -153,7 +153,6 @@ class MangopayPaymentController extends \Core\Controller
         $query = $uri->getQuery();
         $ip = $request->getServerParam('REMOTE_ADDR');
         $event = $this->getEvent($args['token']);
-        $buyer = $event->buyer;
         $params = \Util\Tools::queryGetValues($query);
         $this->logger->info('['.$ip.'] CREATED_CARDGEG_RESPONSE: ',$params);
         $rkey = $this->session->get(\Util\MangopayUtility::SESSION_REGID);
@@ -161,8 +160,7 @@ class MangopayPaymentController extends \Core\Controller
         $reg_response = $this->updateCardReg($event,$rkey,$rdata);
         $this->logger->info('['.$ip.'] UPDATE_CARDGEG_RESPONSE: '.\json_encode($reg_response));
         if(!is_null($reg_response) && !empty($reg_response->CardId)){
-            $buyer->ckey = $reg_response->CardId;
-            $buyer->save();
+            $this->setSessionVar(\Util\MangopayUtility::SESSION_CARDID,$reg_response->CardId);
             $payin_response = $this->createPayin($event,$uri);
             if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
                 if(true === (bool) $payin_response->ExecutionDetails->SecureModeNeeded){
@@ -191,9 +189,7 @@ class MangopayPaymentController extends \Core\Controller
             $cid = $params['cid'];
             $token = $params['token'];
             $event = $this->getEvent($token);
-            $buyer = $event->buyer;
-            $buyer->ckey = $cid;
-            $buyer->save();
+            $this->setSessionVar(\Util\MangopayUtility::SESSION_CARDID,$cid);
             $payin_response = $this->createPayin($event,$uri);
             if(is_object($payin_response) && ($payin_response->Status==\MangoPay\PayInStatus::Created || $payin_response->Status==\MangoPay\PayInStatus::Succeeded)){
                 if(true === (bool) $payin_response->ExecutionDetails->SecureModeNeeded){
@@ -236,9 +232,9 @@ class MangopayPaymentController extends \Core\Controller
     {
         $ip = $request->getServerParam('REMOTE_ADDR');
         $event = $this->getEvent($args['token']);
-        $user = $event->buyer->user;
+        $buyer = $event->buyer;
+        $user = $buyer->user;
         $method = $event->method;
-        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
         $amount = number_format((float) $event->amount/100, 2, ',', ' ');
         $message = '<strong>Produit:</strong> '.$event->product.'<br>';
         $message .= '<strong>Méthode:</strong> '.$method.'<br>';
@@ -250,7 +246,7 @@ class MangopayPaymentController extends \Core\Controller
         return $this->view->render($response, 'Home/payresult.html.twig',[
             'bank_logo' => $method,
             'message' => $message,
-            'status' => $event->status,
+            'status' => $buyer->status,
             'check_url' => $event->token
         ]);
     }
@@ -261,7 +257,7 @@ class MangopayPaymentController extends \Core\Controller
         $event = $this->getEvent($args['token']);
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         if(!is_null($event)){
-            $status = $event->status;
+            $status = $event->buyer->status;
             if($status==\MangoPay\EventType::PayinNormalSucceeded){
                 $title = 'Merci, votre payement nous est bien arrivé.';
             }
@@ -293,13 +289,10 @@ class MangopayPaymentController extends \Core\Controller
 
     private function getPrintContent($event)
     {
-        $status = $event->status;
         $buyer = $event->buyer;
         $user = $buyer->user;
 
         $template = 'Print/print-recept.html.twig';
-
-        //$event_date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->updated_at);
 
         $amount = \number_format((float) $event->amount/100, 2, ',', ' ');
         
@@ -309,7 +302,7 @@ class MangopayPaymentController extends \Core\Controller
             'method' => $event->method,
             'client_name' => $user->name,
             'client_email' => $user->email,
-            'amount' => $amount,
+            'amount' => $amount.' &euro;',
             'token' => $event->token,
             'datetime' => $event->updated_at->format('d/m/Y H:i:s'),
             'error' => ''
@@ -548,7 +541,7 @@ class MangopayPaymentController extends \Core\Controller
             case \Util\MangopayUtility::METHOD_CVM:
                 $payin_options['PaymentType'] = \MangoPay\PayInPaymentType::Card;
                 $payin_options['ExecutionType'] = \MangoPay\PayInExecutionType::Direct;
-                $payin_options['CardId'] = $buyer->ckey;
+                $payin_options['CardId'] = $this->session->get(\Util\MangopayUtility::SESSION_CARDID);
             break;
             default:
                 $payin_options['PaymentType'] = \MangoPay\PayInPaymentType::Card;

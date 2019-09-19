@@ -26,6 +26,7 @@ class MangopayUtility
     const SESSION_METHOD = 'payment_type';
     const SESSION_TOKEN = 'event_token';
     const SESSION_REGID = 'card_regid';
+    const SESSION_CARDID = 'card_id';
 
     const SESSION_PERSON_TYPE = 'person_type';
     const SESSION_PERSON_EMAIL = 'person_email';
