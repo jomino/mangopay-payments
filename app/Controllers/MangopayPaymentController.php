@@ -285,7 +285,7 @@ class MangopayPaymentController extends \Core\Controller
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
         $this->logger->info('['.$ip.'] PRINT_PAYMENT_RESULT -> TOKEN: '.$args['token']);
         $event = $this->getEvent($args['token']);
-        $html = 'Helloworld';//$this->getPrintContent($event);
+        $html = $this->getPrintContent($event);
         return $response->withJson([
             'html' => \base64_encode(utf8_decode($html))
         ]);
