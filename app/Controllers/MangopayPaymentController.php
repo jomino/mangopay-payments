@@ -111,8 +111,10 @@ class MangopayPaymentController extends \Core\Controller
                                     $cards_list = $this->getCards($buyer);
                                     if(!is_null($cards_list)){
                                         if(\sizeof($cards_list)==0){
+                                            $this->logger->info('['.$ip.'] FINALIZE_BUYER_PROCESS -> NEW_CARD_REG');
                                             return $response->write($this->getCardRegPage($event,$uri));
                                         }else{
+                                            $this->logger->info('['.$ip.'] FINALIZE_BUYER_PROCESS -> CARD_LIST: ',$cards_list);
                                             return $this->view->render($response, 'Home/cardscheck.html.twig',[
                                                 'cards_list' => $cards_list,
                                                 'token' => $event->token
@@ -356,13 +358,14 @@ class MangopayPaymentController extends \Core\Controller
             return $buyer;
         }else{
             if($buyer=$this->createNewBuyer($user,$params)){
-                $this->logger->info('['.$ip.'] CREATED_BUYER -> ID: '.$buyer->id);
                 $client = $user->client;
                 $akey = $client->akey;
                 $ckey = $client->ckey;
                 $person_type = $buyer->person_type;
                 $settings = $this->settings['mangopay'];
-                $this->logger->info('['.$ip.'] BUYER_CLIENT -> ID: '.$client->id);
+                $this->logger->info('['.$ip.'] CREATED_BUYER -> ID: '.$buyer->id);
+                $this->logger->info('['.$ip.'] CREATED_BUYER_USER -> ID: '.$user->id);
+                $this->logger->info('['.$ip.'] CREATED_BUYER_CLIENT -> ID: '.$client->id);
                 $kyc_level = $this->getKYCLevel();
                 switch($person_type){
                     case \MangoPay\PersonType::Legal:
@@ -394,24 +397,28 @@ class MangopayPaymentController extends \Core\Controller
                         ];
                     break;
                 }
-                $this->logger->info('['.$ip.'] CREATE_BUYER_USER -> DATA ',$buyer_options);
-                $buyer_response = \Util\MangopayUtility::createUser($ckey,$akey,$settings['tempdir'],$buyer_options);
-                if(is_int($buyer_response)){
-                    $buyer->ukey = $buyer_response;
-                    $wallet_response = \Util\MangopayUtility::createWallet($ckey,$akey,$buyer_response,$settings['tempdir']);
-                    if(is_int($wallet_response)){
-                        $buyer->wkey = $wallet_response;
+                $this->logger->info('['.$ip.'] CREATE_BUYER_SEND ',$buyer_options);
+                $buyer_result = \Util\MangopayUtility::createUser($ckey,$akey,$settings['tempdir'],$buyer_options);
+                $this->logger->info('['.$ip.'] CREATE_BUYER_RESULT '.$buyer_result);
+                if(is_int($buyer_result)){
+                    $buyer->ukey = $buyer_result;
+                    $this->logger->info('['.$ip.'] CREATE_BUYER_WALLET_SEND '.$buyer_result);
+                    $wallet_result = \Util\MangopayUtility::createWallet($ckey,$akey,$buyer_result,$settings['tempdir']);
+                    $this->logger->info('['.$ip.'] CREATE_BUYER_WALLET_RESULT '.$wallet_result);
+                    if(is_int($wallet_result)){
+                        $buyer->wkey = $wallet_result;
                         $buyer->save();
                         return $buyer;
                     }else{
-                        $this->errors[] = $wallet_response;
+                        $this->errors[] = $wallet_result;
                     }
                 }else{
-                    $this->errors[] = $buyer_response;
+                    $this->errors[] = $buyer_result;
                 }
             }else{
                 $this->errors[] = 'CANNOT_CREATE_LOCAL_BUYER';
             }
+            return null;
         }
     }
 
@@ -445,10 +452,10 @@ class MangopayPaymentController extends \Core\Controller
         $ckey = $client->ckey;
         $ukey = $buyer->ukey;
         $settings = $this->settings['mangopay'];
-        $response = \Util\MangopayUtility::getCards($ckey,$akey,$settings['tempdir'],$ukey);
-        if(is_array($response) || is_object($response)){
-            for ($i=0; $i < sizeof((array) $response); $i++) { 
-                $card = $response[$i];
+        $result = \Util\MangopayUtility::getCards($ckey,$akey,$settings['tempdir'],$ukey);
+        if(is_array($result) || is_object($result)){
+            for ($i=0; $i < sizeof((array) $result); $i++) { 
+                $card = $result[$i];
                 if($card->Validity==\MangoPay\CardValidity::Valid){
                     $cards[] = [
                         'cid' => $card->Id,
@@ -460,7 +467,7 @@ class MangopayPaymentController extends \Core\Controller
             }
             return $cards;
         }else{
-            $this->errors[] = is_string($response) ? $response:'UNKNOW_ERROR';
+            $this->errors[] = is_string($result) ? $result:'UNKNOW_ERROR';
         }
         return null;
     }
@@ -468,14 +475,13 @@ class MangopayPaymentController extends \Core\Controller
     private function getCardRegPage($event,$uri)
     {
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
-        $reg_response = $this->createNewCardReg($event);
-        if(!is_null($reg_response) && !empty($reg_response->Id)){
-            $this->logger->info('['.$ip.'] CREATED_CARDREG_RESPONSE: '.\json_encode($reg_response));
-            $this->setSessionVar(\Util\MangopayUtility::SESSION_REGID,$reg_response->Id);
+        $result = $this->createNewCardReg($event);
+        if(!is_null($result) && !empty($result->Id)){
+            $this->setSessionVar(\Util\MangopayUtility::SESSION_REGID,$result->Id);
             return $this->view->fetch( 'Home/cardreg.html.twig',[
-                'post_url' => $reg_response->CardRegistrationURL,
-                'reg_data' => $reg_response->PreregistrationData,
-                'key_ref' => $reg_response->AccessKey,
+                'post_url' => $result->CardRegistrationURL,
+                'reg_data' => $result->PreregistrationData,
+                'key_ref' => $result->AccessKey,
                 'ret_url' => $uri->getScheme().'://'.$uri->getHost().$this->router->pathFor('payment_cardreg',[
                     'token' => $event->token
                 ]),
@@ -496,11 +502,14 @@ class MangopayPaymentController extends \Core\Controller
         $ckey = $client->ckey;
         $ukey = $buyer->ukey;
         $settings = $this->settings['mangopay'];
-        $response = \Util\MangopayUtility::createCardReg($ckey,$akey,$ukey,$settings['tempdir']);
-        if(is_object($response) && $response->Status==\MangoPay\CardRegistrationStatus::Created){
-            return $response;
+        $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
+        $this->logger->info('['.$ip.'] CREATE_CARDREG_SEND -> USER_ID: '.$ukey);
+        $result = \Util\MangopayUtility::createCardReg($ckey,$akey,$ukey,$settings['tempdir']);
+        $this->logger->info('['.$ip.'] CREATED_CARDREG_RESULT: '.\json_encode($result));
+        if(is_object($result) && $result->Status==\MangoPay\CardRegistrationStatus::Created){
+            return $result;
         }else{
-            $this->errors[] = is_string($response) ? $response:$response->ResultMessage??'UNKNOW_ERROR';
+            $this->errors[] = is_string($result) ? $result:$result->ResultMessage??'UNKNOW_ERROR';
         }
         return null;
     }
@@ -513,11 +522,11 @@ class MangopayPaymentController extends \Core\Controller
         $akey = $client->akey;
         $ckey = $client->ckey;
         $settings = $this->settings['mangopay'];
-        $response = \Util\MangopayUtility::updateCardReg($ckey,$akey,$settings['tempdir'],$rkey,$rdata);
-        if(is_object($response) && $response->Status==\MangoPay\CardRegistrationStatus::Validated){
-            return $response;
+        $result = \Util\MangopayUtility::updateCardReg($ckey,$akey,$settings['tempdir'],$rkey,$rdata);
+        if(is_object($result) && $result->Status==\MangoPay\CardRegistrationStatus::Validated){
+            return $result;
         }else{
-            $this->errors[] = is_string($response) ? $response:$response->ResultMessage??'UNKNOW_ERROR';
+            $this->errors[] = is_string($result) ? $result:$result->ResultMessage??'UNKNOW_ERROR';
         }
         return null;
     }
@@ -561,10 +570,10 @@ class MangopayPaymentController extends \Core\Controller
             'Culture' => $this->language ? \strtoupper($this->language):'EN'
         ]);
         $ip = $this->session->get(\Util\MangopayUtility::SESSION_REMOTE);
-        $this->logger->info('['.$ip.'] CREATE_PAYIN -> SEND: ',$payin_options);
-        $payin = \Util\MangopayUtility::createPayin($ckey,$akey,$settings['tempdir'],$payin_options);
-        $this->logger->info('['.$ip.'] CREATED_PAYIN -> RETURN: '.(is_string($payin) ? $payin:\json_encode($payin)));
-        return $payin;
+        $this->logger->info('['.$ip.'] CREATE_PAYIN_SEND: ',$payin_options);
+        $result = \Util\MangopayUtility::createPayin($ckey,$akey,$settings['tempdir'],$payin_options);
+        $this->logger->info('['.$ip.'] CREATED_PAYIN_RESULT: '.(is_string($result) ? $result:\json_encode($result)));
+        return $result;
     }
 
     private function createNewEvent($buyer)
