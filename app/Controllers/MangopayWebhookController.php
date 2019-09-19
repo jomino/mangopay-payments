@@ -35,7 +35,8 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalSucceeded:
                             if($event->status!=$event_type){
-                                $event->status = $event->payin = $event_type;
+                                $event->status = $event_type;
+                                $event->payin = $event_type;
                                 $event->save();
                                 $transfer = $this->initiateTransfer($event);
                                 if(is_object($transfer)){
@@ -56,7 +57,8 @@ class MangopayWebhookController extends \Core\Controller
                         break;
                         case \MangoPay\EventType::PayinNormalFailed:
                             if($event->status!=$event_type){
-                                $event->status = $event->payin = $event_type;
+                                $event->status = $event_type;
+                                $event->payin = $event_type;
                                 $event->save();
                                 $status = 'ERROR';
                                 $message = $event_type.' -> PAYIN_ID '.$ressource_id;
