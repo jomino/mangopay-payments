@@ -48,7 +48,7 @@
                             {# if one of #}
                             {% if card.bank == 'CB' %}{% set card_icon = 'pf-cb' %}{% endif %}
                             {% if card.bank == 'VISA' %}{% set card_icon = 'pf-visa' %}{% endif %}
-                            {% if card.bank == 'MASTERCARD' %}{% set card_icon = 'pf-american-express-alt' %}{% endif %}
+                            {% if card.bank == 'MASTERCARD' %}{% set card_icon = 'pf-mastercard-alt' %}{% endif %}
                             <form action="{{- path_for('payment_accepted') -}}" method="post">
                                 <input type="hidden" name="{{csrf.keys.name}}" value="{{csrf.name}}">
                                 <input type="hidden" name="{{csrf.keys.value}}" value="{{csrf.value}}">
